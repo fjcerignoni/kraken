@@ -8,6 +8,7 @@ import json
 import pandas as pd
 import jellyfish as jf
 import datetime
+#TODO Adicionar logging
 
 import discord
 from discord.ext import commands
@@ -19,6 +20,7 @@ currentPath = os.path.dirname(os.path.realpath(__file__))
 # load functions
 def loadItems():
     item_list = os.getenv("ITEMLIST")
+    # adicionar lib retry
 
     try:
         with urllib.request.urlopen(item_list) as url:
@@ -33,39 +35,37 @@ def getItems(item):
     tier = None
     enchantment = None
     try:
-        item_list = loadItems()
+        item_list = loadItems() 
+        #TODO avaliar colocar pra carregar no inicio da aplicação;
+        #     colocar um validador de timestamp para atualizar a lista depois de algum tempo
 
-        if re.search("[tT]+[4-8].[1-3]",item):
-            break_sufix = item[-5:].replace(' ','').split('.')
-            tier = break_sufix[0].upper()
-            enchantment = '@'+break_sufix[1]
+        # item = 'espada dupla t5.2' ; 'espada dupla', 'espada dupla t5'
+        if re.search("[tT]+[4-8].[1-3]",item): #t5.2
+            tier, enchantment = item[-5:].replace(' ','').split('.')
+            tier = tier.upper()
+            enchantment = '@'+ enchantment
             item = item[:-5]
-        elif re.search("[tT]+[3-8]", item):
-            sufix = item[-3:].replace(' ','')
-            tier = sufix.upper()
+        elif re.search("[tT]+[3-8]", item): #t5
+            tier = item[-3:].replace(' ','').upper()
             item = item[:-3]
         else:
             pass
 
-        item_list['score'] = item_list['LocalizedNames.PT-BR'].apply(lambda i: jf.jaro_distance(item.lower(), i.lower()))
+        item_list['score'] = [jf.jaro_distance(item.lower(), i.lower()) for i in item_list['LocalizedNames.PT-BR']]     
         unique = item_list[item_list['score'] == item_list['score'].max()]['UniqueName'].iloc[0]
-        suggested =  item_list[(item_list['UniqueName'].str.contains(unique[3:])) & (item_list['score'] > 0.7)] 
+        suggested =  item_list[(item_list['UniqueName'].str.contains(unique[3:])) & (item_list['score'] > 0.7)] # em construção
 
         for name in suggested['UniqueName'].tolist():
             if tier and enchantment:
-                if name.startswith(tier) and name.endswith(enchantment):
+                if name.startswith(tier) and name.endswith(enchantment): # T5_SWORD@2
                     unique = name
                     break
-                else:
-                    continue
             elif tier:
-                if name.startswith(tier):
+                if name.startswith(tier): # T5_SWORD
                     unique = name
                     break
-                else:
-                    continue
             else:
-                pass    
+                break
         return unique, suggested
     except Exception as e:
         print(e)
@@ -215,4 +215,5 @@ async def price(ctx, *, item):
                 # for emoji in suggested_emojis:
                 #     await message.add_reaction(emoji)
 
-bot.run(os.getenv("TOKEN"))
+if __name__ == '__main__':
+    bot.run(os.getenv("TOKEN"))
