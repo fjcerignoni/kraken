@@ -2,13 +2,13 @@
 Discord Bot to fetch Albion Online information for the Shadow Spirits Guild 
 
 # Commands
-### $price "item name and tier"
+### $price "item name tier"
 
 Fetch item price from the [Albion Online Data Project](https://www.albion-online-data.com/)
 
 ### Usage:
 
-Type the name of the item in Brazilian Portuguese (PT-BT) and the tier you want in front of it. </br>
+Type the name of the item in Brazilian Portuguese (PT-BT) and the tier you want in front of it in 'tX.X' format </br>
 If no tier information is supplied the bot will return the lowest tier for the item.
 
 ```
