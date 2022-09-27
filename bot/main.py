@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 
+from data import get_items
 from market import Market
 
 # load .env with TOKEN value
@@ -25,9 +26,12 @@ bot = commands.Bot(
 async def on_ready():
     # Login message in console
     print(f'Logged in as {bot.user}')
-
+    
+    ## TODO trabalhar no timestamp para atualização da lista
+    item_list = await get_items()
+    
     # Add Cogs
-    await bot.add_cog(Market(bot))
+    await bot.add_cog(Market(bot, item_list))
 
     # guild = bot.get_guild(1022920500919410709)
     # memberList = guild.members
