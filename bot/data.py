@@ -17,6 +17,7 @@ async def get_items():
         print(e)
 
 async def find_item(typed, item_list):
+    t_item_name = None
     item_name = None
     tier = None
     enchantment = None
@@ -31,6 +32,10 @@ async def find_item(typed, item_list):
         elif re.search("[tT]+[3-8]", typed):
             tier = typed[-3:].replace(' ','').upper()
             t_item_name = typed[:-3]
+        else:
+            t_item_name = typed
+
+        print(t_item_name, tier, enchantment)
 
         ## TODO tentar atribuir valor à uma classe pydantic
         for item in item_list:
@@ -45,6 +50,8 @@ async def find_item(typed, item_list):
             item_name = f'{tier}_{with_scores[0]["UniqueName"][3:]}{enchantment}'
         elif tier:
             item_name = f'{tier}_{with_scores[0]["UniqueName"][3:]}'
+        else:
+            item_name = with_scores[0]["UniqueName"]
 
         return next((item for item in item_list if item.UniqueName == item_name), None).UniqueName
     except Exception as e:
