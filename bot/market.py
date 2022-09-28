@@ -40,7 +40,7 @@ class Market(commands.Cog):
                     sell_price_all = []
                     time_string_all = []
 
-                    for (i, price) in enumerate(prices):
+                    for price in prices:
                         # Skip if no data for entry
                         if price.sell_price_min == 0:
                             continue
@@ -67,7 +67,7 @@ class Market(commands.Cog):
                         sell_price_all.append(price.sell_price_min)
 
                         # TIME
-                        # calculate time delta find how long ago the date was updated
+                        # calculate time delta to find how long ago the date was updated
                         tdelta = datetime.datetime.utcnow() - price.sell_price_min_date
                         tdelta = datetime.timedelta.total_seconds(tdelta)
 
