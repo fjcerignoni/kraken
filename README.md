@@ -21,8 +21,9 @@ If no tier information is supplied the bot will return the lowest tier for the i
 - Requirements:
   - Python 3.8 or higher
   - Create Discord Bot at [Discord Developers Applications](https://discord.com/developers/applications) to get a valid token and use [Discord Permissions](https://discordapi.com/permissions.html) to add the bot in your server
-  - Add token to a .env file in the project root, use .env-sample as exemple.
   - Clone this repository
+  - Add token to a .env file in the project root, use .env-sample as exemple.
+
 
 1) Create python environment
    ```
