@@ -15,3 +15,40 @@ If no tier information is supplied the bot will return the lowest tier for the i
     $price brumário t6.2
 ```
 ![shadow-bot1](https://user-images.githubusercontent.com/21298220/191596762-d332d892-4990-412a-9082-e607303362fb.PNG)
+
+# Dev Environment
+
+- Requirements:
+  - Python 3.8 or higher
+  - Create Discord Bot at [Discord Developers Applications](https://discord.com/developers/applications) to get a valid token and use [Discord Permissions](https://discordapi.com/permissions.html) to add the bot in your server
+  - Add token to a .env file in the project root, use .env-sample as exemple.
+  - Clone this repository
+
+1) Create python environment
+   ```
+    $ python -m venv --clear --copies .venv
+   ```
+2) Enter environment 
+   ```
+   Windows
+    $ .venv\Scripts\activate.bat
+
+   Linux
+    $ source .venv\bin\activate
+   ```
+3) Upgrade pip and wheel
+   ```
+    (.venv) $ python -m pip install --upgrade pip wheel
+   ```
+
+4) Install dependencies
+
+   ```
+    (.venv) $ python -m pip install -r requirements.txt
+   ```
+
+5) Start bot
+   ```
+    (.venv) $python bot\main.py
+   ```
+
