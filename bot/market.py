@@ -5,7 +5,7 @@ import datetime
 import discord
 from discord.ext import commands
 
-from data import find_item, get_prices, get_image_url
+from data_functions import find_item, get_prices, get_image_url
 ## TODO Adicionar logging
 
 load_dotenv()

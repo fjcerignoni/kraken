@@ -16,7 +16,7 @@ async def get_items():
     except Exception as e:
         print(e)
 
-async def find_item(typed, item_list):
+async def find_item(text, item_list):
     t_item_name = None
     item_name = None
     tier = None
@@ -24,16 +24,16 @@ async def find_item(typed, item_list):
     with_scores=[]
 
     try:
-        if re.search("[tT]+[4-8].[1-3]", typed):
-            t_tier, t_enchantment = typed[-5:].replace(' ','').split('.')
+        if re.search("[tT]+[4-8].[1-3]", text):
+            t_tier, t_enchantment = text[-5:].replace(' ','').split('.')
             tier = t_tier.upper()
             enchantment = '@'+t_enchantment
-            t_item_name = typed[:-5]
-        elif re.search("[tT]+[3-8]", typed):
-            tier = typed[-3:].replace(' ','').upper()
-            t_item_name = typed[:-3]
+            t_item_name = text[:-5]
+        elif re.search("[tT]+[3-8]", text):
+            tier = text[-3:].replace(' ','').upper()
+            t_item_name = text[:-3]
         else:
-            t_item_name = typed
+            t_item_name = text
 
         print(t_item_name, tier, enchantment)
 
@@ -75,3 +75,26 @@ async def get_image_url(item, quality = 3):
     except Exception as e:
         print(e)
     
+def _url(endpoint):
+    return f'https://gameinfo.albiononline.com/api/gameinfo/{endpoint}'
+
+def _search(text):
+    return f'{_url("search")}?q={text}'
+
+async def get_guild_id(text):
+    try:
+        with urllib.request.urlopen(_search(text).replace(' ', '%20')) as src:
+            data = json.loads(src.read().decode())
+            return data['guilds'][0]['Id']
+    except Exception as e:
+        print(e)
+
+async def get_guild_members(guild_id):
+    try:
+        with urllib.request.urlopen(f'{_url("guilds")}/{guild_id}/members') as src:
+            data = json.loads(src.read().decode())
+            members = [obj['Name'] for obj in data]
+            members.sort()
+            return members
+    except Exception as e:
+        print(e)

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 
-from data import get_items
+from data_functions import get_items
 from market import Market
 
 # load .env with TOKEN value
