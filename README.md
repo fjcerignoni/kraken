@@ -1,4 +1,4 @@
-# Shadow Bot
+# Kraken
 Discord Bot to fetch Albion Online information for the Shadow Spirits Guild 
 
 # Commands
