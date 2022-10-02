@@ -1,5 +1,7 @@
 # Kraken
-Discord Bot to fetch Albion Online information for the Shadow Spirits Guild 
+Discord Bot to fetch Albion Online information for the Shadow Spirits Guild
+
+<img src="https://user-images.githubusercontent.com/21298220/193434889-c774aaaa-1b97-431c-a528-c655ad33c0f0.PNG" alt="kraken" style="height: 70px; width: 80px; align: right"/>
 
 # Commands
 ### $price "item name tier"
