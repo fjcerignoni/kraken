@@ -47,7 +47,12 @@ If no tier information is supplied the bot will return the lowest tier for the i
     (.venv) $ python -m pip install -r requirements.txt
    ```
 
-5) Start bot
+5) Create database
+   ```
+    (.venv) $python bot\db\init_db.py
+   ```
+
+6) Start bot
    ```
     (.venv) $python bot\main.py
    ```
