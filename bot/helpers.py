@@ -4,7 +4,9 @@ import json
 import re
 import jellyfish as jf
 
-from data_models import Item, Price
+from data_models import Item, Price, Guild, Player
+
+# ITEMS API
 
 async def get_items():
     url = "https://raw.githubusercontent.com/broderickhyman/ao-bin-dumps/master/formatted/items.json"
@@ -35,7 +37,7 @@ async def find_item(text, item_list):
         else:
             t_item_name = text
 
-        print(t_item_name, tier, enchantment)
+        # print(t_item_name, tier, enchantment)
 
         ## TODO tentar atribuir valor à uma classe pydantic
         for item in item_list:
@@ -57,6 +59,9 @@ async def find_item(text, item_list):
     except Exception as e:
         print(e)
 
+
+## MARKET API
+
 async def get_prices(item):
     main_url = 'https://www.albion-online-data.com/api/v2/stats/prices/'
     locations = '?locations=Caerleon,Lymhurst,Martlock,Bridgewatch,FortSterling,Thetford' 
@@ -65,7 +70,7 @@ async def get_prices(item):
     try:
         with urllib.request.urlopen(url) as src:
             data = json.loads(src.read().decode())
-            return [Price(**item_price) for item_price in data]
+            return [Price(**obj) for obj in data]
     except Exception as e:
         print(e)
     
@@ -74,27 +79,30 @@ async def get_image_url(item, quality = 3):
         return f'https://render.albiononline.com/v1/item/{item}.png?&quality={quality}'
     except Exception as e:
         print(e)
-    
+
+
+## GUILD AND PALYERS API
+
 def _url(endpoint):
     return f'https://gameinfo.albiononline.com/api/gameinfo/{endpoint}'
 
 def _search(text):
     return f'{_url("search")}?q={text}'
 
-async def get_guild_id(text):
+async def get_guild(text):
     try:
         with urllib.request.urlopen(_search(text).replace(' ', '%20')) as src:
             data = json.loads(src.read().decode())
-            return data['guilds'][0]['Id']
+            return Guild(Id=data['guilds'][0]["Id"], Name=data['guilds'][0]["Name"])
+            
     except Exception as e:
         print(e)
 
-async def get_guild_members(guild_id):
+async def get_guild_players(guild_id):
     try:
         with urllib.request.urlopen(f'{_url("guilds")}/{guild_id}/members') as src:
             data = json.loads(src.read().decode())
-            members = [obj['Name'] for obj in data]
-            members.sort()
-            return members
+            return [Player(Id=obj["Id"], Name=obj["Name"]) for obj in data]
+            
     except Exception as e:
         print(e)

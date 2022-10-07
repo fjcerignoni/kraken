@@ -1,15 +1,8 @@
-import os
-from dotenv import load_dotenv
-import datetime
-
-import discord
+from discord import Embed
 from discord.ext import commands
-
-from data_functions import find_item, get_prices, get_image_url
+from datetime import datetime, timedelta
+from helpers import find_item, get_prices, get_image_url
 ## TODO Adicionar logging
-
-load_dotenv()
-currentPath = os.path.dirname(os.path.realpath(__file__))
 
 class Market(commands.Cog):
     def __init__(self, bot, item_list):
@@ -68,8 +61,8 @@ class Market(commands.Cog):
 
                         # TIME
                         # calculate time delta to find how long ago the date was updated
-                        tdelta = datetime.datetime.utcnow() - price.sell_price_min_date
-                        tdelta = datetime.timedelta.total_seconds(tdelta)
+                        tdelta = datetime.utcnow() - price.sell_price_min_date
+                        tdelta = timedelta.total_seconds(tdelta)
 
                         if tdelta >= 3600:
                             time_string = str(round(tdelta/3600, 1)) + ' horas'
@@ -86,7 +79,7 @@ class Market(commands.Cog):
                 finally:
                 
                     # EMBED 
-                    embed = discord.Embed(
+                    embed = Embed(
                         title=f'Preços atuais para {item_name}',
                         description=f'{item_desc}'
                     )
@@ -122,7 +115,7 @@ class Market(commands.Cog):
                         #     await message.add_reaction(emoji)
             except Exception as e:
                 print(e)
-                embed = discord.Embed(
+                embed = Embed(
                     title=f'Item não encontrado',
                     description=f'Não encontramos informação para o item requisitado.'
                 )

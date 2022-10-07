@@ -1,19 +1,26 @@
-import os
+from os import getenv
+from pathlib import Path
 from dotenv import load_dotenv
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 import discord
 from discord.ext import commands
 
-from data_functions import get_items
-from market import Market
-
+from helpers import get_items
+from cogs.admin import Admin
+from cogs.market import Market
 # load .env with TOKEN value
 load_dotenv()
-currentPath = os.path.dirname(os.path.realpath(__file__))
+current_path = current_path = Path(__file__).parent.absolute()
+db_path = current_path / 'db' / 'kraken.sqlite'
 
 # discord intents
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
+intents.guilds = True
 
 # client = discord.Client(intents=intents)
 bot = commands.Bot(
@@ -25,21 +32,21 @@ bot = commands.Bot(
 @bot.event
 async def on_ready():
     # Login message in console
-    print(f'Logged in as {bot.user}')
-    
-    ## TODO trabalhar no timestamp para atualização da lista
-    item_list = await get_items()
-    
-    # Add Cogs
-    await bot.add_cog(Market(bot, item_list))
 
-    # guild = bot.get_guild(1022920500919410709)
-    # memberList = guild.members
+    try:
+            ## TODO trabalhar no timestamp para atualização da lista
+        item_list = await get_items()
+        engine = create_engine(f"sqlite:///{db_path}")
+        Session = sessionmaker(engine)
+        
+        # Add Cogs
+        await bot.add_cog(Admin(bot, Session))
+        await bot.add_cog(Market(bot, item_list))
 
-    # print(guild)
-    # for member in memberList:
-    #     m = await guild.fetch_member(member.id)
-    #     print(m.nick)
+        print(f'Logged in as {bot.user}')
+    except Exception as e:
+        print(e)
+        print("Unable to log in")
 
 if __name__ == '__main__':
-    bot.run(os.getenv("TOKEN"))
+    bot.run(getenv("TOKEN"))
