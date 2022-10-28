@@ -31,7 +31,7 @@ class Item(BaseModel):
     LocalizedDescriptions: Optional[Locations] = None
     Index: int
     UniqueName: str
-    score: Optional[float] = None
+    score: Optional[float] = 0.0
 
 class Price(BaseModel):
     item_id: str
@@ -82,28 +82,6 @@ class AlbionGuilds(Base):
     guild_id = Column(String, primary_key=True)
     guild_name = Column(String)
     server_id = Column(Integer, ForeignKey("servers.server_id"))
-
-# class Members(Base):
-#     __tablename__ = "members"
-#     member_id = Column(Integer, primary_key=True)
-#     # member_name = Column(String)
-#     # member_nick = Column(String)
-#     server_id = Column(Integer, ForeignKey("servers.server_id"))
-#     role_id = Column(Integer, ForeignKey("roles.role_id"))
-
-# class Guilds(Base):
-#     __tablename__ = "guilds"
-#     guild_id = Column(String, primary_key=True)
-#     guild_name = Column(String)
-#     server_id = Column(Integer, ForeignKey("servers.server_id"))
-    # players = relationship("Players", backref=backref("guilds"))
-
-# class Players(Base):
-#     __tablename__ = "players"
-#     player_id = Column(String, primary_key=True)
-#     player_name = Column(String)
-#     guild_id = Column(String, ForeignKey("guilds.guild_id"))
-#     taxes = relationship("Taxes", backref=backref("players"))
 
 # class Taxes(Base):
 #     __tablename__ = "taxes"

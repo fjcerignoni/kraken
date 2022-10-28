@@ -1,6 +1,8 @@
 from pathlib import Path
 import sqlite3
 
+# TODO estudar alembic para construir o banco.
+
 current_path = Path(__file__).parent.absolute()
 try:
     with open(current_path / 'kraken_schema.sql', 'r') as sql_file:

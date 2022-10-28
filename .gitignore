@@ -1,7 +1,10 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
 *.env
 *.ipynb
 *.sqlite
 
 .venv
-
-/bot/__pycache__

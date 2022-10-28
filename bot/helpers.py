@@ -6,9 +6,14 @@ import jellyfish as jf
 
 from data_models import Item, Price, Guild, Player
 
-# ITEMS API
 
-async def get_items():
+def _similarity_score(a:str, b:str) -> float:
+    score =  jf.jaro_distance(a.lower(), b.lower())
+    return score
+
+# ITEMS APIs
+
+async def get_items() -> list[Item]:
     url = "https://raw.githubusercontent.com/broderickhyman/ao-bin-dumps/master/formatted/items.json"
     try:
         with urllib.request.urlopen(url) as src:
@@ -18,54 +23,49 @@ async def get_items():
     except Exception as e:
         print(e)
 
-async def find_item(text, item_list):
-    t_item_name = None
-    item_name = None
+async def find_item(usr_input:str, item_list:list[Item]) -> str:
     tier = None
     enchantment = None
-    with_scores=[]
+
+    resource_list = list(set(item.UniqueName.split('_')[1] for item in item_list if re.search("LEVEL+[1,3]+@",item.UniqueName)))
 
     try:
-        if re.search("[tT]+[4-8].[1-3]", text):
-            t_tier, t_enchantment = text[-5:].replace(' ','').split('.')
-            tier = t_tier.upper()
-            enchantment = '@'+t_enchantment
-            t_item_name = text[:-5]
-        elif re.search("[tT]+[3-8]", text):
-            tier = text[-3:].replace(' ','').upper()
-            t_item_name = text[:-3]
+        if re.search("[tT]+[4-8].[1-3]", usr_input):
+            tier, enchantment = usr_input[-5:].replace(' ','').split('.')
+            usr_input = usr_input[:-5]
+        elif re.search("[tT]+[3-8]", usr_input):
+            tier = usr_input[-3:].replace(' ','')
+            usr_input = usr_input[:-3]
         else:
-            t_item_name = text
+            pass
 
-        # print(t_item_name, tier, enchantment)
-
-        ## TODO tentar atribuir valor à uma classe pydantic
         for item in item_list:
-            if item.LocalizedNames:
-                score = jf.jaro_distance(t_item_name.lower(), item.LocalizedNames.PTBR.lower())
-                temp = item.dict()
-                temp['score'] = score
-                with_scores.append(temp)
-        with_scores.sort(reverse = True, key=lambda obj: obj['score'])
+            if item.LocalizedNames: 
+                item.score = _similarity_score(usr_input, item.LocalizedNames.PTBR)
+        item_list.sort(reverse = True, key=lambda item: item.score)
 
         if tier and enchantment:
-            item_name = f'{tier}_{with_scores[0]["UniqueName"][3:]}{enchantment}'
+            if any(resource in item_list[0].UniqueName for resource in resource_list):
+                unique_name = f'{tier.upper()}_{item_list[0].UniqueName[3:]}_LEVEL{enchantment}@{enchantment}'
+            else:
+                unique_name = f'{tier.upper()}_{item_list[0].UniqueName[3:]}@{enchantment}'
         elif tier:
-            item_name = f'{tier}_{with_scores[0]["UniqueName"][3:]}'
+            unique_name = f'{tier.upper()}_{item_list[0].UniqueName[3:]}'
         else:
-            item_name = with_scores[0]["UniqueName"]
+            unique_name = item_list[0].UniqueName
 
-        return next((item for item in item_list if item.UniqueName == item_name), None).UniqueName
+        return next((item for item in item_list if item.UniqueName == unique_name), None).UniqueName
+
     except Exception as e:
         print(e)
 
 
 ## MARKET API
 
-async def get_prices(item):
+async def get_prices(unique_name:str) -> list[Price]:
     main_url = 'https://www.albion-online-data.com/api/v2/stats/prices/'
     locations = '?locations=Caerleon,Lymhurst,Martlock,Bridgewatch,FortSterling,Thetford' 
-    url = main_url + item + locations
+    url = main_url + unique_name + locations
 
     try:
         with urllib.request.urlopen(url) as src:
@@ -74,31 +74,31 @@ async def get_prices(item):
     except Exception as e:
         print(e)
     
-async def get_image_url(item, quality = 3):
+async def get_image_url(unique_name:str, quality:int = 3) -> str:
     try:
-        return f'https://render.albiononline.com/v1/item/{item}.png?&quality={quality}'
+        return f'https://render.albiononline.com/v1/item/{unique_name}.png?&quality={quality}'
     except Exception as e:
         print(e)
 
 
 ## GUILD AND PALYERS API
 
-def _url(endpoint):
+def _url(endpoint:str) -> str:
     return f'https://gameinfo.albiononline.com/api/gameinfo/{endpoint}'
 
-def _search(text):
-    return f'{_url("search")}?q={text}'
+def _search(input:str) -> str:
+    return f'{_url("search")}?q={input}'
 
-async def get_guild(text):
+async def get_guild(guild_name:str) -> Guild:
     try:
-        with urllib.request.urlopen(_search(text).replace(' ', '%20')) as src:
+        with urllib.request.urlopen(_search(urllib.parse.quote(guild_name))) as src:            
             data = json.loads(src.read().decode())
             return Guild(Id=data['guilds'][0]["Id"], Name=data['guilds'][0]["Name"])
             
     except Exception as e:
         print(e)
 
-async def get_guild_players(guild_id):
+async def get_guild_players(guild_id:str) -> list[Player]:
     try:
         with urllib.request.urlopen(f'{_url("guilds")}/{guild_id}/members') as src:
             data = json.loads(src.read().decode())
