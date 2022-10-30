@@ -34,7 +34,7 @@ If no tier information is supplied the bot will return the lowest tier for the i
     $ .venv\Scripts\activate.bat
 
    Linux
-    $ source .venv\bin\activate
+    $ source .venv/bin/activate
    ```
 3) Upgrade pip and wheel
    ```

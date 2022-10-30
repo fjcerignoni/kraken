@@ -44,14 +44,13 @@ async def on_ready():
 
     try:
         ## TODO trabalhar no timestamp para atualização da lista
-        item_list = await get_items()
         engine = create_engine(f"sqlite:///{db_path}")
         Session = sessionmaker(engine)
         
         # Add Cogs
         await bot.add_cog(Admin(bot, getenv("GOD_ID"), Session))
         await bot.add_cog(Raids(bot, getenv("GOD_ID"), Session, reaction_list))
-        await bot.add_cog(Market(bot, item_list))
+        await bot.add_cog(Market(bot))
         
         # Login message in console
         print(f'Logged in as {bot.user}')

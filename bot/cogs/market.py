@@ -3,16 +3,15 @@ from discord import Embed
 from discord.ext import commands
 from datetime import datetime, timedelta
 
-from helpers import find_item, get_prices, get_image_url
+from helpers import find_item, get_prices, get_image_url, get_items
 from data_models import Item
 ## TODO Adicionar logging
 
-setlocale(LC_ALL, 'pt-BR.UTF-8')
+setlocale(LC_ALL, 'pt_BR.UTF-8')
 
 class Market(commands.Cog):
-    def __init__(self, bot: commands.Bot , item_list: list[Item]) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.item_list = item_list
 
     @commands.command()
     async def price(self, ctx: commands.Context, *, typed:str) -> None:
@@ -20,10 +19,15 @@ class Market(commands.Cog):
         async with ctx.typing():
             try:
                 # Load selected items info
-                selected_item = await find_item(typed, self.item_list)
+                selected_item = await find_item(typed)
 
                 # Get item name and desciption
-                item_info = next((item for item in self.item_list if item.UniqueName == selected_item))
+                item_info = next(
+                    (
+                        item for item in await get_items()
+                            if item.UniqueName == selected_item
+                    )
+                )
 
                 item_name = item_info.LocalizedNames.PTBR
                 item_desc = item_info.LocalizedDescriptions.PTBR

@@ -8,3 +8,6 @@ __pycache__/
 *.sqlite
 
 .venv
+
+scheduler/logs
+bot/db/items.json
