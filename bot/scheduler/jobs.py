@@ -3,9 +3,11 @@ import logging
 import os
 import urllib.request
 
-#APP_DIR = os.path.join('/opt', 'kraken')
-APP_DIR = os.environ.get('APP_DIR', os.path.join('/mnt', 'f', 'git', 'kraken'))
-LOG_DIR = os.environ.get('LOG_DIR', os.path.join(APP_DIR, 'scheduler', 'logs'))
+from dotenv import load_dotenv
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+APP_DIR = os.environ.get('APP_DIR', os.path.join(BASE_DIR, '../..'))
+LOG_DIR = os.environ.get('LOG_DIR', os.path.join(APP_DIR, 'bot', 'scheduler', 'logs'))
 
 
 def main():

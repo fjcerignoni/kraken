@@ -8,7 +8,7 @@ RUN apt-get update && \
 
 WORKDIR $APP_DIR
 
-COPY ./scheduler ./scheduler
+COPY ./bot/scheduler ./bot/scheduler
 COPY requirements.txt .
 COPY supervisord.conf .
 
