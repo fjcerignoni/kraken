@@ -9,5 +9,5 @@ __pycache__/
 
 .venv
 
-scheduler/logs
+*.log
 bot/db/items.json
