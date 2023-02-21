@@ -15,6 +15,10 @@ class Market(commands.Cog):
         self.item_list = item_list
 
     @commands.command()
+    async def price_help(self, ctx: commands.Context) -> None:
+        a=0
+
+    @commands.command()
     async def price(self, ctx: commands.Context, *, typed:str) -> None:
         # Loading
         async with ctx.typing():
