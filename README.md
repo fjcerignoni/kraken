@@ -54,6 +54,7 @@ The list will be shown as a discord message and each role will have his own emoj
 ```
 $organize_raid avalon 21/02/2023 "Saída as 18:00;Levar montaria rápida; Comida .2"
 ```
+![image](https://user-images.githubusercontent.com/21298220/220457109-71013ce8-3657-4a80-b6c6-a9f5b78fc5b2.png)
 
 ### $organize_raid_help
 
