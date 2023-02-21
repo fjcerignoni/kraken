@@ -1,17 +1,17 @@
 from os import getenv
 from pathlib import Path
-from dotenv import load_dotenv
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 import discord
 from discord.ext import commands
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from helpers import get_items
 from cogs.admin import Admin
 from cogs.market import Market
 from cogs.raids import Raids
+from helpers import get_items
+from scheduler import jobs
 
 # load .env with TOKEN value
 load_dotenv()
@@ -44,14 +44,13 @@ async def on_ready():
 
     try:
         ## TODO trabalhar no timestamp para atualização da lista
-        item_list = await get_items()
         engine = create_engine(f"sqlite:///{db_path}")
         Session = sessionmaker(engine)
         
         # Add Cogs
         await bot.add_cog(Admin(bot, getenv("GOD_ID"), Session))
         await bot.add_cog(Raids(bot, getenv("GOD_ID"), Session, reaction_list))
-        await bot.add_cog(Market(bot, item_list))
+        await bot.add_cog(Market(bot))
         
         # Login message in console
         print(f'Logged in as {bot.user}')
@@ -61,6 +60,13 @@ async def on_ready():
         print("Unable to log in")
 
 
+def failsafe_etl_run():    
+    jobs.get_items()
+
+
 if __name__ == '__main__':
     # TODO gunicorn para substituir o nodemon.
+
+    failsafe_etl_run()
+
     bot.run(getenv("TOKEN"))

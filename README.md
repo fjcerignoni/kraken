@@ -34,7 +34,7 @@ If no tier information is supplied the bot will return the lowest tier for the i
     $ .venv\Scripts\activate.bat
 
    Linux
-    $ source .venv\bin\activate
+    $ source .venv/bin/activate
    ```
 3) Upgrade pip and wheel
    ```
@@ -57,3 +57,9 @@ If no tier information is supplied the bot will return the lowest tier for the i
     (.venv) $python bot\main.py
    ```
 
+# Scheduler
+Inside the ``scheduler`` folder there are 2 scripts: ``scheduler.py`` and ``jobs.py``
+- ``jobs.py``: ETL processes that can be executed manually or scheduled by applications/libraries like *python-crontab*;
+- ``scheduler.py``: *python-crontab* implementation to run jobs defined on ``jobs.py``;
+
+The shell script ``build.sh`` was created in order to provide a dockerized version of scheduled jobs (*Linux* environment with *docker.io* installed is required).

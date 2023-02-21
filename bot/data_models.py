@@ -1,11 +1,12 @@
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, Field
-
+from sqlalchemy import (Column, Date, DateTime, ForeignKey, Integer, String,
+                        Table)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Table, Column, Integer, String, Date, DateTime, ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import backref, relationship
+
 
 # API DATA MODELS
 class Locations(BaseModel):
