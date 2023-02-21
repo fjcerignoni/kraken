@@ -22,7 +22,8 @@ class Raids(commands.Cog):
         description = """
 $organize_raid <content> <date> <description>
 
-O comando $organize_raid serve para auxiliar a guild montar uma party para algum conteúdo
+O comando $organize_raid serve para auxiliar a guild montar uma party para algum conteúdo.
+É necessário permissão de moderador para executar esse comando.
         """
         template = ''.join(f"{template}\n" for template in templates.keys())
         params = """
