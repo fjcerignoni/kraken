@@ -22,13 +22,13 @@ class Raids(commands.Cog):
         description = """
 $organize_raid <content> <date> <description>
 
-O comando $organize_raid serve para auxiliar a guild montar uma party para algum conterúdo
+O comando $organize_raid serve para auxiliar a guild montar uma party para algum conteúdo
         """
         template = ''.join(f"{template}\n" for template in templates.keys())
         params = """
 <content> : define a composição das vagas de acordo com os templates disponíveis.
 <date> : data no formato DD/MM/AAAA.
-<description> descrição : extra para o conteúdo, como horario, IP, montaria, etc. Utilize ';' para quebrar linha.        
+<description> : descrição extra para o conteúdo, como horario, IP, montaria, etc. Utilize ';' para quebrar linha.        
         """
         
         embed = Embed(title="ORGANIZE RAID HELP", description=description)
