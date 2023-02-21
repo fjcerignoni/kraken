@@ -19,8 +19,7 @@ def _similarity_score(a:str, b:str) -> float:
 
 async def get_items() -> list[Item]:
 
-    item_list_filepath = os.path.join(BASE_DIR, 'db', 'items.json')
-
+    item_list_filepath = os.path.join(BASE_DIR, 'bot', 'db', 'items.json')
     try:
         if os.path.exists(item_list_filepath):
             with open(item_list_filepath, 'r', encoding='utf8') as file:
@@ -40,12 +39,10 @@ async def find_item(usr_input:str) -> str:
     tier = None
     enchantment = None
 
-    resource_list = [
-        set(
+    resource_list = list(set(
             item.UniqueName.split('_')[1] for item in item_list
-            if re.search("LEVEL+[1,3]+@",item.UniqueName)
-        )
-    ]
+            if re.search("LEVEL+[1,4]+@",item.UniqueName)
+        ))
 
     try:
         if re.search("[tT]+[4-8].[1-4]", usr_input):
@@ -76,7 +73,6 @@ async def find_item(usr_input:str) -> str:
 
     except Exception as e:
         print(e)
-
 
 ## MARKET API
 
