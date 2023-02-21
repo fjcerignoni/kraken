@@ -30,7 +30,7 @@ async def find_item(usr_input:str, item_list:list[Item]) -> str:
     resource_list = list(set(item.UniqueName.split('_')[1] for item in item_list if re.search("LEVEL+[1,3]+@",item.UniqueName)))
 
     try:
-        if re.search("[tT]+[4-8].[1-3]", usr_input):
+        if re.search("[tT]+[4-8].[1-4]", usr_input):
             tier, enchantment = usr_input[-5:].replace(' ','').split('.')
             usr_input = usr_input[:-5]
         elif re.search("[tT]+[3-8]", usr_input):
