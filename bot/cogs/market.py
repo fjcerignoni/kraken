@@ -1,31 +1,37 @@
-import os
-from dotenv import load_dotenv
-import datetime
-
-import discord
+from locale import setlocale, format_string, LC_ALL
+from discord import Embed
 from discord.ext import commands
+from datetime import datetime, timedelta
 
-from data import find_item, get_prices, get_image_url
+from helpers import find_item, get_prices, get_image_url, get_items
+from data_models import Item
 ## TODO Adicionar logging
 
-load_dotenv()
-currentPath = os.path.dirname(os.path.realpath(__file__))
+setlocale(LC_ALL, 'pt_BR.UTF-8')
 
 class Market(commands.Cog):
-    def __init__(self, bot, item_list):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.item_list = item_list
 
     @commands.command()
-    async def price(self, ctx, *, typed):
+    async def price_help(self, ctx: commands.Context) -> None:
+        a=0
+
+    @commands.command()
+    async def price(self, ctx: commands.Context, *, typed:str) -> None:
         # Loading
         async with ctx.typing():
             try:
                 # Load selected items info
-                selected_item = await find_item(typed, self.item_list)
+                selected_item = await find_item(typed)
 
                 # Get item name and desciption
-                item_info = next((item for item in self.item_list if item.UniqueName == selected_item))
+                item_info = next(
+                    (
+                        item for item in await get_items()
+                            if item.UniqueName == selected_item
+                    )
+                )
 
                 item_name = item_info.LocalizedNames.PTBR
                 item_desc = item_info.LocalizedDescriptions.PTBR
@@ -68,8 +74,8 @@ class Market(commands.Cog):
 
                         # TIME
                         # calculate time delta to find how long ago the date was updated
-                        tdelta = datetime.datetime.utcnow() - price.sell_price_min_date
-                        tdelta = datetime.timedelta.total_seconds(tdelta)
+                        tdelta = datetime.utcnow() - price.sell_price_min_date
+                        tdelta = timedelta.total_seconds(tdelta)
 
                         if tdelta >= 3600:
                             time_string = str(round(tdelta/3600, 1)) + ' horas'
@@ -85,46 +91,38 @@ class Market(commands.Cog):
 
                 finally:
                 
-                    # EMBED 
-                    embed = discord.Embed(
-                        title=f'Preços atuais para {item_name}',
-                        description=f'{item_desc}'
-                    )
-                    embed.set_thumbnail(url= await get_image_url(selected_item))
-                    embed.add_field(name="confira os preços abaixo", value=20*"-", inline=False)
-
                     try:
-                    # construct embed fields
-                        em_sell_price = ''
-                        em_time_string = ''
-                        em_location_string = ''
+                        # EMBED 
+                        embed = Embed(
+                            title=f'Preços atuais para {item_name}',
+                            description=f'{item_desc}'
+                        )
+                        embed.set_thumbnail(url= await get_image_url(selected_item))
+                        embed.add_field(name="confira os preços abaixo", value=20*"-", inline=False)
 
-                        for (i, location_string) in enumerate(location_string_all):
-                            if sell_price_all[i] != 0:
-                                em_location_string += location_string + "\n"
-                                em_sell_price += format(sell_price_all[i], ',d') + "\n"
-                                em_time_string += time_string_all[i] + "\n"
+                    
+                        # construct embed fields
+                        em_location_string = ''.join(f"{location_string}\n" for location_string in location_string_all)
+                        em_sell_price = ''.join(f"{format_string('%d', sell_price, 1)}\n" for sell_price in sell_price_all)
+                        em_time_string = ''.join(f"{time_string}\n" for time_string in time_string_all)
 
                         if em_sell_price:
                             embed.add_field(name="Local/Qualidade", value=em_location_string, inline=True)
                             embed.add_field(name="Valor Vendido", value=em_sell_price, inline=True)
                             embed.add_field(name="Atualização", value=em_time_string, inline=True)
+                        else:
+                            raise Exception
                     
                     except Exception as e:
                         print(e)
                         embed.add_field(name="Sem Dados", value="Sem dados para o item requisitado.", inline=True)
 
-                    finally:
-                        embed.set_footer(text="Desenvolvido por Ac1dTrip")
-                        await ctx.send(embed=embed)
-
-                        # for emoji in suggested_emojis:
-                        #     await message.add_reaction(emoji)
             except Exception as e:
                 print(e)
-                embed = discord.Embed(
+                embed = Embed(
                     title=f'Item não encontrado',
                     description=f'Não encontramos informação para o item requisitado.'
                 )
+            finally:
                 embed.set_footer(text="Desenvolvido por Ac1dTrip")
                 await ctx.send(embed=embed)

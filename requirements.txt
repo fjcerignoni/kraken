@@ -1,4 +1,7 @@
+croniter
 discord==2.0.0
 jellyfish==0.9.0
 pydantic==1.10.2
+python-crontab
 python-dotenv==0.21.0
+SQLAlchemy==1.4.41

@@ -1,7 +1,14 @@
-from pydantic import BaseModel, Field
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
+from pydantic import BaseModel, Field
+from sqlalchemy import (Column, Date, DateTime, ForeignKey, Integer, String,
+                        Table)
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import backref, relationship
+
+
+# API DATA MODELS
 class Locations(BaseModel):
     ENUS:str = Field(default=None, alias='EN-US')
     DEDE:str = Field(default=None,alias='DE-DE')
@@ -25,7 +32,7 @@ class Item(BaseModel):
     LocalizedDescriptions: Optional[Locations] = None
     Index: int
     UniqueName: str
-    score: Optional[float] = None
+    score: Optional[float] = 0.0
 
 class Price(BaseModel):
     item_id: str
@@ -39,3 +46,47 @@ class Price(BaseModel):
     buy_price_min_date: datetime
     buy_price_max: int
     buy_price_max_date: datetime
+
+class Guild(BaseModel):
+    Id: str
+    Name: str
+
+class Player(BaseModel):
+    Id: str
+    Name: str
+
+# DATABASE DATA MODELS
+Base = declarative_base()
+
+class Servers(Base):
+    __tablename__ = "servers"
+    server_id = Column(Integer, primary_key=True)
+    server_name = Column(String)
+    owner_id = Column(Integer)
+    owner_name = Column(String)
+    permissions = relationship("Permited", backref=backref("servers"))
+
+class Roles(Base):
+    __tablename__ = "roles"
+    role_id = Column(Integer, primary_key=True)
+    role_name = Column(String)
+
+class Permited(Base):
+    __tablename__ = "permited"
+    member_id = Column(Integer, primary_key=True)
+    member_name = Column(String)
+    server_id = Column(Integer, ForeignKey("servers.server_id"))
+    role_id = Column(Integer, ForeignKey("roles.role_id"))
+
+class AlbionGuilds(Base):
+    __tablename__ = "albion_guilds"
+    guild_id = Column(String, primary_key=True)
+    guild_name = Column(String)
+    server_id = Column(Integer, ForeignKey("servers.server_id"))
+
+# class Taxes(Base):
+#     __tablename__ = "taxes"
+#     tax_id = Column(Integer, primary_key=True)
+#     player_id = Column(String, ForeignKey("players.player_id"))
+#     silver = Column(Integer)
+#     ref = Column(Date)

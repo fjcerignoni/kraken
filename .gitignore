@@ -1,6 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
 *.env
 *.ipynb
+*.sqlite
 
 .venv
 
-/bot/__pycache__
+*.log
+bot/db/items.json
