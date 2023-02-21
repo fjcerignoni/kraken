@@ -2,6 +2,25 @@
 Discord Bot to fetch Albion Online information for the Shadow Spirits Guild 
 
 # Commands
+
+## ADM
+
+### $init
+
+Initiate the discord server for a given Guild. 
+It asks and save the IGN of the Guild.
+
+### $check_players
+
+List all the players in the subscribed Guild.
+
+### $give_permition "user_name"
+
+Give moderation permition to a given user.
+The users with permition should be able to execute Raid commands.
+
+## MARKET
+
 ### $price "item name tier"
 
 Fetch item price from the [Albion Online Data Project](https://www.albion-online-data.com/)
@@ -15,6 +34,30 @@ If no tier information is supplied the bot will return the lowest tier for the i
     $price brumário t6.2
 ```
 ![shadow-bot1](https://user-images.githubusercontent.com/21298220/191596762-d332d892-4990-412a-9082-e607303362fb.PNG)
+
+
+## RAID
+
+### $organize_raid "content date 'description'"
+
+Organize a list of roles to a certain content.
+The content list templates are located in ``cogs\raids_template.json``
+
+To consult the list of templates execute the command ``$organize_raid_help``
+
+### Usage:
+
+Type the template name of the raid, followed by the date in DD/MM/YYYY and the description of the raid. Use ``;`` to break lines in the description.
+
+The list will be shown as a discord message and each role will have his own emoji. The players then should select the emoji they want to fill the specific role.
+
+```
+$organize_raid avalon 21/02/2023 "Saída as 18:00;Levar montaria rápida; Comida .2"
+```
+
+### $organize_raid_help
+
+Show help to organize a raid in Discord.
 
 # Dev Environment
 
