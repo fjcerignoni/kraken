@@ -13,10 +13,14 @@ from cogs.raids import Raids
 from helpers import get_items
 from scheduler import jobs
 
-# load .env with TOKEN value
+# load .env 
 load_dotenv()
+
 current_path = current_path = Path(__file__).parent.absolute()
 db_path = current_path / 'db' / 'kraken.sqlite'
+
+print(current_path)
+
 
 # discord intents
 intents = discord.Intents.default()
