@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from turtle import title
 from discord import Embed
 from discord.ext import commands
 from data_models import Permited
@@ -8,7 +7,7 @@ from data_models import Permited
 current_path = current_path = Path(__file__).parent.absolute()
 
 class Raids(commands.Cog):
-    def __init__(self, bot:commands.Bot, god_id:int, Session: object, reaction_list: list[str]) -> None:
+    def __init__(self, bot:commands.Bot, god_id:int, Session: object, reaction_list: list) -> None:
         self.bot = bot
         self.god_id = god_id
         self.Session = Session

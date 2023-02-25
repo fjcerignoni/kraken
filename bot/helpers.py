@@ -17,7 +17,7 @@ def _similarity_score(a:str, b:str) -> float:
 
 # ITEMS APIs
 
-async def get_items() -> list[Item]:
+async def get_items() -> list:
 
     item_list_filepath = os.path.join(BASE_DIR, 'bot', 'db', 'items.json')
     try:
@@ -76,7 +76,7 @@ async def find_item(usr_input:str) -> str:
 
 ## MARKET API
 
-async def get_prices(unique_name:str) -> list[Price]:
+async def get_prices(unique_name:str) -> list:
     main_url = 'https://www.albion-online-data.com/api/v2/stats/prices/'
     locations = '?locations=Caerleon,Lymhurst,Martlock,Bridgewatch,FortSterling,Thetford' 
     url = main_url + unique_name + locations
@@ -106,7 +106,7 @@ def _search(input:str) -> str:
     return f'{_url("search")}?q={input}'
 
 
-async def get_guild(guild_name:str) -> Guild:
+async def get_guild(guild_name:str) -> dict:
     try:
         with urllib.request.urlopen(_search(urllib.parse.quote(guild_name))) as src:            
             data = json.loads(src.read().decode())
@@ -116,7 +116,7 @@ async def get_guild(guild_name:str) -> Guild:
         print(e)
 
 
-async def get_guild_players(guild_id:str) -> list[Player]:
+async def get_guild_players(guild_id:str) -> list:
     try:
         with urllib.request.urlopen(f'{_url("guilds")}/{guild_id}/members') as src:
             data = json.loads(src.read().decode())
