@@ -11,6 +11,7 @@ docker build \
 
 docker run \
     --detach \
+    --env-file=.env \
     --name $CONTAINER_NAME \
     --volume $(pwd)/bot/db:/opt/kraken/bot/db \
     $IMAGE_NAME
