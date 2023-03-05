@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8-slim-buster
 
 ENV APP_DIR=/opt/kraken
 
