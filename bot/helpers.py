@@ -104,6 +104,7 @@ def _url(endpoint:str) -> str:
 
 def _search(input:str) -> str:
     return f'{_url("search")}?q={input}'
+    
 def _player_info_url(player_id:str) -> str:
     return f'{_url("players")}/{player_id}'
 
