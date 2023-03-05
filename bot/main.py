@@ -10,6 +10,7 @@ from sqlalchemy.orm import sessionmaker
 from cogs.admin import Admin
 from cogs.market import Market
 from cogs.raids import Raids
+from cogs.profile import Profile
 from helpers import get_items
 from scheduler import jobs
 
@@ -20,8 +21,6 @@ current_path = current_path = Path(__file__).parent.absolute()
 db_path = current_path / 'db' / 'kraken.sqlite'
 
 print(current_path)
-
-
 # discord intents
 intents = discord.Intents.default()
 intents.message_content = True
@@ -55,7 +54,8 @@ async def on_ready():
         await bot.add_cog(Admin(bot, getenv("GOD_ID"), Session))
         await bot.add_cog(Raids(bot, getenv("GOD_ID"), Session, reaction_list))
         await bot.add_cog(Market(bot))
-        
+        await bot.add_cog(Profile(bot))
+
         # Login message in console
         print(f'Logged in as {bot.user}')
 

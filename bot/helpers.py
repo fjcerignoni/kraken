@@ -104,7 +104,8 @@ def _url(endpoint:str) -> str:
 
 def _search(input:str) -> str:
     return f'{_url("search")}?q={input}'
-
+def _player_info_url(player_id:str) -> str:
+    return f'{_url("players")}/{player_id}'
 
 async def get_guild(guild_name:str) -> dict:
     try:
@@ -122,5 +123,21 @@ async def get_guild_players(guild_id:str) -> list:
             data = json.loads(src.read().decode())
             return [Player(Id=obj["Id"], Name=obj["Name"]) for obj in data]
             
+    except Exception as e:
+        print(e)
+
+async def get_player(player_name:str) -> dict:
+    try:
+        # Search for player by name
+        with urllib.request.urlopen(_search(urllib.parse.quote(player_name))) as src:
+            data = json.loads(src.read().decode())
+            player_id = data['players'][0]['Id']
+
+        # Get player info by ID
+        with urllib.request.urlopen(_player_info_url(player_id)) as src:
+            data = json.loads(src.read().decode())
+
+            return data
+
     except Exception as e:
         print(e)
