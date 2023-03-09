@@ -1,13 +1,70 @@
-from pathlib import Path
+# from pathlib import Path
+from locale import setlocale, format_string, LC_ALL
 from discord.ext import commands
 from discord import Embed
-from helpers import get_player
+from helpers import get_player, get_guild, get_guild_players, get_alliance
 
-current_path = current_path = Path(__file__).parent.absolute()
+# current_path = current_path = Path(__file__).parent.absolute()
+setlocale(LC_ALL, 'pt_BR.UTF-8')
 
 class Profile(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+
+    @commands.command()
+    async def profile_guild(self, ctx:commands.Context, *, typed:str) -> None:
+        async with ctx.typing():
+            try:
+                guild = await get_guild(typed)
+                if guild == None:
+                  raise Exception('Guild not found.')
+            
+                alliance = await get_alliance(guild.AllianceId)
+
+                # create list with players name consulting tools4albion API and sort
+                players = [player.Name for player in await get_guild_players(guild.Id)]
+                players.sort()
+
+                # create chunks to better display the information in discord embed
+                chunk_size= int(len(players) / 3)
+                chunk=[players[i:i + chunk_size] for i in range(0, len(players), chunk_size)]
+
+                column1 = ''.join(f'{player}\n' for player in chunk[0])
+                column2 = ''.join(f'{player}\n' for player in chunk[1])
+                column3 = ''.join(f'{player}\n' for player in chunk[2])
+
+                # crate embed
+                embed = Embed(
+                    title=f'> [{guild.AllianceTag}] {guild.Name}',
+                    color=0xFF5733
+                )
+
+                embed.add_field(name="Criada em", value=guild.Founded.strftime("%d/%m/%y"), inline=True)
+                embed.add_field(name="Kill Fame", value=format_string('%d', guild.KillFame, 1), inline=True)
+                embed.add_field(name="Death Fame", value=format_string('%d', guild.DeathFame, 1), inline=True)
+               
+                embed.add_field(name="", value="```Jogadores```", inline=False)
+                embed.add_field(name="Nº Players", value=len(players), inline=False)
+                embed.add_field(name="", value=column1, inline=True)
+                embed.add_field(name="", value=column2, inline=True)
+                embed.add_field(name="", value=column3, inline=True)
+
+                if alliance != None:
+                  embed.add_field(name="", value="```Aliança```", inline=False)
+                  embed.add_field(name="Nome", value=alliance.AllianceName, inline=True)
+                  embed.add_field(name="Tag", value=alliance.AllianceTag, inline=True)
+                  embed.add_field(name="Nº Players", value=alliance.NumPlayers, inline=True)
+
+                embed.set_footer(text="""
+Estas informações são carregadas do projeto tools4albion e podem
+ter um delay alguns dias em relação ao Albion Online.
+
+Desenvolvido por Ac1dTrip & Caionagyy""")
+                
+                await ctx.send(embed=embed)
+            except Exception as e:
+                await ctx.send('Ocorreu um erro.')
+                print(e)
 
     @commands.command()
     async def profile(self, ctx: commands.Context, *args) -> None:
@@ -18,19 +75,19 @@ class Profile(commands.Cog):
                   player_data = await get_player(nickname)
                   
                   if player_data == None:
-                        raise Exception("Player not found")
+                        raise Exception("Player not found.")
                   
                   ally = player_data['AllianceName']
                   guild = player_data['GuildName']
                   pve_stats = player_data['LifetimeStatistics']['PvE']
-                  # Criando um objeto Embed com título, descrição, imagem e cor
+                  # Criando um objeto Embed com título, imagem e cor
 
-                  embed = Embed(title="> Perfil do jogador", description=f"{player_data['Name']}", color=0xFF5733)
+                  embed = Embed(title=f"> {player_data['Name']}", color=0xFF5733)
                   embed.set_thumbnail(
                         url="https://render.albiononline.com/v1/spell/HASTE.png")
 
                   # Adicionando campos com informações
-                  embed.add_field(name="Guild", value=f"({ally}) {guild}\n", inline=False)
+                  embed.add_field(name="Guild", value=f"[{ally}] {guild}\n", inline=False)
                   embed.add_field(name="", value=f"```PvP```", inline=False)
                   embed.add_field(name="Kill Fame", value=f'{player_data["KillFame"]:,}', inline=True)
                   embed.add_field(name="Death Fame", value=f'{player_data["DeathFame"]:,}', inline=True)
@@ -91,7 +148,11 @@ class Profile(commands.Cog):
                         description=f'Não encontramos informações para o jogador requisitado.'
                   )
             finally:
-                  embed.set_footer(text="Desenvolvido por Ac1dTrip")
+                  embed.set_footer(text="""
+Estas informações são carregadas do projeto tools4albion e podem
+ter um delay alguns dias em relação ao Albion Online.
+
+Desenvolvido por Ac1dTrip & Caionagyy""")
                   # Enviando o embed para o canal
                   await ctx.send(embed=embed)
 
