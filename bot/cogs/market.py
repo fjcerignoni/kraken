@@ -124,5 +124,5 @@ class Market(commands.Cog):
                     description=f'Não encontramos informação para o item requisitado.'
                 )
             finally:
-                embed.set_footer(text="Desenvolvido por Ac1dTrip")
+                embed.set_footer(text="Desenvolvido por Ac1dTrip & Caionagyy")
                 await ctx.send(embed=embed)
