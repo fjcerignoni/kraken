@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict
 
 from pydantic import BaseModel, Field
 from sqlalchemy import (Column, Date, DateTime, ForeignKey, Integer, String,
@@ -47,13 +47,36 @@ class Price(BaseModel):
     buy_price_max: int
     buy_price_max_date: datetime
 
+class Alliance(BaseModel):
+    AllianceId: str
+    AllianceName: str
+    AllianceTag: str
+    FounderId: str
+    FounderName: str
+    Founded: datetime
+    Guilds: List[Dict]
+    NumPlayers: int
+
 class Guild(BaseModel):
     Id: str
     Name: str
+    FounderId: str
+    FounderName: str
+    Founded: datetime
+    AllianceTag: Optional[str] = None
+    AllianceId: Optional[str] = None
+    AllianceName: Optional[str] = None
+    Logo: Optional[str] = None
+    KillFame: Optional[int] = None
+    DeathFame: Optional[int] = None
+    AttacksWon: Optional[int] = None
+    DefensesWon: Optional[int] = None
+    MemberCount: int
 
 class Player(BaseModel):
     Id: str
     Name: str
+
 
 # DATABASE DATA MODELS
 Base = declarative_base()
