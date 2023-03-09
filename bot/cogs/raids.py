@@ -2,14 +2,14 @@ import json
 from pathlib import Path
 from discord import Embed
 from discord.ext import commands
-from data_models import Permited
+from data_models import Servers, Permited
 
 current_path = current_path = Path(__file__).parent.absolute()
 
 class Raids(commands.Cog):
     def __init__(self, bot:commands.Bot, god_id:int, Session: object, reaction_list: list) -> None:
         self.bot = bot
-        self.god_id = god_id
+        self.god_id = int(god_id)
         self.Session = Session
         self.reaction_list = reaction_list
 
@@ -19,21 +19,23 @@ class Raids(commands.Cog):
             templates = json.load(file)
         
         description = """
-$organize_raid <content> <date> <description>
+> $organize_raid <content> <date> <description>
 
 O comando $organize_raid serve para auxiliar a guild montar uma party para algum conteúdo.
 É necessário permissão de moderador para executar esse comando.
         """
-        template = ''.join(f"{template}\n" for template in templates.keys())
+        template = ''.join(f"> {template}\n" for template in templates.keys())
         params = """
-<content> : define a composição das vagas de acordo com os templates disponíveis.
-<date> : data no formato DD/MM/AAAA.
-<description> : descrição extra para o conteúdo, como horario, IP, montaria, etc. Utilize ';' para quebrar linha.        
+> <content> : define a composição das vagas de acordo com os templates disponíveis.
+> <date> : data no formato DD/MM/AAAA.
+> <description> : descrição extra para o conteúdo, como horario, IP, montaria, etc. Utilize ';' para quebrar linha.        
         """
         
-        embed = Embed(title="ORGANIZE RAID HELP", description=description)
-        embed.add_field(name="Parametros", value=params, inline=False)
-        embed.add_field(name="Templates", value=template, inline=False)
+        embed = Embed(title="> ORGANIZE RAID HELP", description=description)
+        embed.add_field(name="", value="```Parametros```", inline=False)
+        embed.add_field(name="", value=params, inline=False)
+        embed.add_field(name="", value="```Templates```", inline=False)
+        embed.add_field(name="", value=template, inline=False)
         embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip.")
 
         await ctx.send(embed=embed)
@@ -44,7 +46,11 @@ O comando $organize_raid serve para auxiliar a guild montar uma party para algum
         
         # Check if author is in the database:
         with self.Session() as session:
-            perms = session.query(Permited).filter(Permited.role_id >= 2).all()
+            perms = session.query(Permited) \
+                     .join(Servers) \
+                     .filter(Servers.server_id == ctx.guild.id) \
+                     .filter(Permited.role_id >= 2) \
+                     .all()
             permited = [perm.member_id for perm in perms]
 
         if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id or ctx.author.id in permited:
@@ -58,20 +64,21 @@ O comando $organize_raid serve para auxiliar a guild montar uma party para algum
 
                 embed_body = ''.join(f"{reaction} - {role} ;\n" for reaction,role in zip(reaction_list, templates[r_type]))
 
-                embed = Embed(title=r_type.upper(), description=r_date)
-                embed.add_field(name='Informações', value=r_details.replace(';','\n'), inline=False)
-                embed.add_field(name='Vagas', value=embed_body, inline=False)              
-                embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip.")
+                embed = Embed(title=f'> {r_type.upper()}', description=r_date)
+                embed.add_field(name='> Informações', value=r_details.replace(';','\n'), inline=False)
+
+                embed.add_field(name='> Vagas', value=embed_body, inline=False)              
+                embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip")
+                
                 msg = await ctx.send(embed=embed)
                 for reaction in reaction_list:
                     await msg.add_reaction(reaction)
-                print(msg.id)
 
             else:
                 embed_body = ''.join(f"{template}\n" for template in templates.keys())
                 embed = Embed(title='Erro', description='Template Inválido')
                 embed.add_field(name='Templates disponíveis', value=embed_body)
-                embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip.")
+                embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip")
                 await ctx.send(embed=embed)    
         else:
             await ctx.send("Você não tem permissões para executar esse comando")
