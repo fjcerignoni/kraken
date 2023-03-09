@@ -14,4 +14,5 @@ docker run \
     --env-file=.env \
     --name $CONTAINER_NAME \
     --volume $(pwd)/bot/db:/opt/kraken/bot/db \
+    --restart unless-stopped \
     $IMAGE_NAME

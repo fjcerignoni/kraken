@@ -16,7 +16,6 @@ from scheduler import jobs
 
 # load .env 
 load_dotenv()
-
 current_path = current_path = Path(__file__).parent.absolute()
 db_path = current_path / 'db' / 'kraken.sqlite'
 

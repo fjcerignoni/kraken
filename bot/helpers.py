@@ -6,7 +6,7 @@ import urllib.request
 
 import jellyfish as jf
 
-from data_models import Guild, Item, Player, Price
+from data_models import Alliance, Guild, Item, Player, Price
 
 BASE_DIR = os.path.dirname(os.path.abspath(__name__))
 
@@ -104,15 +104,47 @@ def _url(endpoint:str) -> str:
 
 def _search(input:str) -> str:
     return f'{_url("search")}?q={input}'
-    
-def _player_info_url(player_id:str) -> str:
-    return f'{_url("players")}/{player_id}'
+
+async def get_alliance(alliance_id:str) -> dict:
+    try:
+        with urllib.request.urlopen(f'{_url("alliances")}/{alliance_id}') as src:
+            data = json.loads(src.read().decode())
+
+            return Alliance( \
+                    AllianceId=data["AllianceId"], \
+                    AllianceName=data["AllianceName"], \
+                    AllianceTag=data["AllianceTag"], \
+                    FounderId=data["FounderId"], \
+                    FounderName=data["FounderName"], \
+                    Founded=data["Founded"], \
+                    Guilds=data["Guilds"],
+                    NumPlayers=data["NumPlayers"]
+            )
+    except Exception as e:
+        print(e)
 
 async def get_guild(guild_name:str) -> dict:
     try:
-        with urllib.request.urlopen(_search(urllib.parse.quote(guild_name))) as src:            
+        with urllib.request.urlopen(_search(urllib.parse.quote(guild_name))) as src:      
+            guild_id = json.loads(src.read().decode())['guilds'][0]["Id"]
+        with urllib.request.urlopen(f'{_url("guilds")}/{guild_id}') as src:
             data = json.loads(src.read().decode())
-            return Guild(Id=data['guilds'][0]["Id"], Name=data['guilds'][0]["Name"])
+            return Guild( \
+                    Id=data["Id"], \
+                    Name=data["Name"], \
+                    FounderId=data["FounderId"], \
+                    FounderName=data["FounderName"], \
+                    Founded=data["Founded"], \
+                    AllianceTag=data["AllianceTag"], \
+                    AllianceId=data["AllianceId"],  \
+                    AllianceName=data["AllianceName"], \
+                    Logo=data["Logo"], \
+                    KillFame=data["killFame"], \
+                    DeathFame=data["DeathFame"], \
+                    AttacksWon=data["AttacksWon"], \
+                    DefensesWon=data["DefensesWon"], \
+                    MemberCount=data["MemberCount"] \
+            )
             
     except Exception as e:
         print(e)
@@ -131,11 +163,9 @@ async def get_player(player_name:str) -> dict:
     try:
         # Search for player by name
         with urllib.request.urlopen(_search(urllib.parse.quote(player_name))) as src:
-            data = json.loads(src.read().decode())
-            player_id = data['players'][0]['Id']
-
+            player_id = json.loads(src.read().decode())['players'][0]['Id']
         # Get player info by ID
-        with urllib.request.urlopen(_player_info_url(player_id)) as src:
+        with urllib.request.urlopen(f'{_url("players")}/{player_id}') as src:
             data = json.loads(src.read().decode())
 
             return data
