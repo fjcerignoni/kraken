@@ -1,9 +1,10 @@
-FROM python:3.8-slim-buster
+FROM python:3.8
 
 ENV APP_DIR=/opt/kraken
 
 RUN apt-get update && \
-    apt-get install -y locales locales-all
+    apt-get install -y locales locales-all && \
+    apt-get install -y sqlite3 libsqlite3-dev
 
 WORKDIR $APP_DIR
 
@@ -20,5 +21,6 @@ ENV PATH=$APP_DIR/.venv/bin:$PATH
 
 RUN python -m pip install --upgrade pip wheel && \
               pip install -r requirements.txt
+
 
 CMD ["python", "/opt/kraken/bot/main.py"]
