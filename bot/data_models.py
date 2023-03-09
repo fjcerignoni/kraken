@@ -77,7 +77,6 @@ class Player(BaseModel):
     Id: str
     Name: str
 
-
 # DATABASE DATA MODELS
 Base = declarative_base()
 
