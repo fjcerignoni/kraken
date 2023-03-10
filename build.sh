@@ -3,6 +3,8 @@
 CONTAINER_NAME=kraken
 IMAGE_NAME=$CONTAINER_NAME-image
 
+docker volume create --name $VOLUME_NAME
+
 docker rm -f $CONTAINER_NAME
 
 docker build \
