@@ -1,6 +1,10 @@
 FROM python:3.8
 
 ENV APP_DIR=/opt/kraken
+<<<<<<< HEAD
+ENV DB_DIR=$APP_DIR/bot/db
+=======
+>>>>>>> 3a9458874d1ca3086b2acdbab8136e66002e4ba6
 
 RUN apt-get update && \
     apt-get install -y locales locales-all && \
@@ -22,5 +26,7 @@ ENV PATH=$APP_DIR/.venv/bin:$PATH
 RUN python -m pip install --upgrade pip wheel && \
               pip install -r requirements.txt
 
+RUN if [ -f $DB_DIR/kraken.sqlite ]; then echo "database ok"; else sqlite3 $DB_DIR/kraken.sqlite < kraken_schema.sql; fi
+RUN if [ -f $DB_DIR/items.json ]; then echo "items list ok"; else python $APP_DIR/bot/scheduler/jobs.py; fi
 
 CMD ["python", "/opt/kraken/bot/main.py"]
