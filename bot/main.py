@@ -31,14 +31,6 @@ bot = commands.Bot(
     intents=intents
 )
 
-# reactions form raid embeds.
-reaction_list = ["\U0001F1E6", "\U0001F1E7", "\U0001F1E8",
-        "\U0001F1E9", "\U0001F1EA", "\U0001F1EB", "\U0001F1EC",
-        "\U0001F1ED", "\U0001F1EE",  "\U0001F1F0",
-        "\U0001F1F1", "\U0001F1F2", "\U0001F1F3", "\U0001F1F4",
-        "\U0001F1F5", "\U0001F1F6", "\U0001F1F7", "\U0001F1F8",
-        "\U0001F1F9", "\U0001F1FA" ] # J: "\U0001F1EF"
-
 # events
 @bot.event
 async def on_ready():
@@ -50,7 +42,7 @@ async def on_ready():
         
         # Add Cogs
         await bot.add_cog(Admin(bot, getenv("GOD_ID"), Session))
-        await bot.add_cog(Raids(bot, getenv("GOD_ID"), Session, reaction_list))
+        await bot.add_cog(Raids(bot, getenv("GOD_ID"), Session))
         await bot.add_cog(Market(bot))
         await bot.add_cog(Profile(bot))
 
