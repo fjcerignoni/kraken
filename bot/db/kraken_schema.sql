@@ -16,10 +16,11 @@ role_id INTEGER PRIMARY KEY NOT NULL,
 role_name TEXT NOT NULL);
 
 CREATE TABLE permited (
-    member_id INTEGER PRIMARY KEY NOT NULL,
+    member_id INTEGER NOT NULL,
     member_name TEXT NOT NULL,
     server_id INTEGER NOT NULL,
     role_id INTEGER DEFAULT 1,
+    PRIMARY KEY (member_id, server_id),
     FOREIGN KEY(server_id) REFERENCES servers(server_id),
     FOREIGN KEY(role_id) REFERENCES roles(role_id)
 );
