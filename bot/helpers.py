@@ -17,8 +17,17 @@ def _similarity_score(a:str, b:str) -> float:
     score =  jf.jaro_distance(a.lower(), b.lower())
     return score
 
-async def get_raid_templates() -> dict:
-    raid_templates_filepath = os.path.join(DB_DIR, 'raid_templates.json')
+async def save_raid_templates(server_id, new_template) -> None:   
+    raid_templates_filepath = os.path.join(DB_DIR, 'raid_templates', f'{server_id}.json')
+    try: 
+        with open(raid_templates_filepath, 'w', encoding='utf-8') as file:
+            json.dump(new_template, file, indent=4)
+
+    except Exception as e:
+        print(e)
+
+async def get_raid_templates(server_id) -> dict:
+    raid_templates_filepath = os.path.join(DB_DIR, 'raid_templates', f'{server_id}.json')
     try: 
         if os.path.exists(raid_templates_filepath):
             with open(raid_templates_filepath, 'r', encoding='utf-8') as file:
@@ -26,20 +35,7 @@ async def get_raid_templates() -> dict:
                 
             return raid_templates
         else:
-            raise Exception('file db/raid_templates.json not found.')
-    except Exception as e:
-        print(e)
-
-async def save_raid_templates(new_template) -> None:
-    raid_templates_filepath = os.path.join(DB_DIR, 'raid_templates.json')
-    try: 
-        if os.path.exists(raid_templates_filepath):
-            with open(raid_templates_filepath, 'w', encoding='utf-8') as file:
-                json.dump(new_template, file, indent=4)
-                
-            return raid_templates
-        else:
-            raise Exception('file db/raid_templates.json not found.')
+            raise Exception('json file not found.')
     except Exception as e:
         print(e)
 
