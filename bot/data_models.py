@@ -33,6 +33,7 @@ class Item(BaseModel):
     Index: int
     UniqueName: str
     score: Optional[float] = 0.0
+    score_locale: Optional[str] = None
 
 class Price(BaseModel):
     item_id: str
@@ -67,7 +68,7 @@ class Guild(BaseModel):
     AllianceId: Optional[str] = None
     AllianceName: Optional[str] = None
     Logo: Optional[str] = None
-    KillFame: Optional[int] = None
+    killFame: Optional[int] = None
     DeathFame: Optional[int] = None
     AttacksWon: Optional[int] = None
     DefensesWon: Optional[int] = None

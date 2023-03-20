@@ -14,7 +14,12 @@ class Admin(commands.Cog):
     @commands.command()
     async def init(self, ctx:commands.Context) -> None:
         """
-            Saves server and guild informations in the database
+            Initiate the bot.
+
+            This command saves server, owner and guild information in the database.
+            This information is important for permitions control.
+
+            This command is available to server owner only.
         """
         async with ctx.typing():
             if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id:
@@ -103,6 +108,14 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def give_permition(self, ctx: commands.Context, member: Member, role:str = 'moderator') -> None:
+        """
+            <@user>
+
+            Command to give moderator permition to a given user. 
+            The permition is used to run raid commands.
+            
+            This command is available to server owner only.
+        """
         if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id: 
             async with ctx.typing():
                 try:
@@ -140,6 +153,13 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def revoke_permition(self, ctx: commands.Context, member: Member) -> None:
+        """
+            <@user>
+
+            Command to revoke moderator permition of a given user.
+
+            This command is available to server owner only.
+        """
         if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id: 
             async with ctx.typing():
                 try:
