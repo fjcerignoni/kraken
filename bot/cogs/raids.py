@@ -48,17 +48,15 @@ class Raids(commands.Cog):
 
         if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id or ctx.author.id in permited:
 
-            templates = await get_raid_templates()
+            templates = await get_raid_templates(ctx.guild.id)
 
             if templates and template in templates.keys():
 
                 reaction_list = self.reaction_list[:len(templates[template])]
 
                 embed_body = ''.join(f"{reaction} - {role}: \n" for reaction,role in zip(reaction_list, templates[template]))
-
                 embed = Embed(title=f'> {template.upper()}', description=date)
                 embed.add_field(name='> Informações', value=description.replace(';','\n'), inline=False)
-
                 embed.add_field(name='> Vagas', value=embed_body, inline=False)              
                 embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip")
                 
@@ -80,6 +78,7 @@ class Raids(commands.Cog):
             try:
                 payload = await self.bot.wait_for('raw_reaction_add', check=lambda payload: payload.emoji.name in self.reaction_list)
                 channel = await self.bot.fetch_channel(payload.channel_id)
+                
                 msg = await channel.fetch_message(payload.message_id)
 
                 if payload.member == self.bot.user:
@@ -123,7 +122,7 @@ class Raids(commands.Cog):
 
     @commands.command()
     async def raid_templates(self, ctx:commands.Context) -> None:
-        templates = await get_raid_templates()
+        templates = await get_raid_templates(ctx.guild.id)
         if templates:
 
             embed = Embed(title='> Templates', description='Templates disponíveis para o comando $organize_raid')
@@ -132,7 +131,7 @@ class Raids(commands.Cog):
             embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip")
             await ctx.send(embed=embed)
         else:
-            embed = Embed(title='Erro', description='Não foi possível realizar o comando.')
+            embed = Embed(title='Erro', description='Não foi possível realizar o comando.\n\nTente executar o comando:\n$create_raid_template <template>')
             embed.set_footer(text="Raid Organizer desenvolvido por Ac1dTrip")
             await ctx.send(embed=embed)
 
@@ -142,7 +141,8 @@ class Raids(commands.Cog):
 
         async with ctx.typing():
             if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id or ctx.author.id in permited:
-                templates = await get_raid_templates()
+                templates = await get_raid_templates(ctx.guild.id)
+
                 if templates and new_template in templates:
                     await ctx.send("Template já existe")
                 else:
@@ -169,11 +169,13 @@ class Raids(commands.Cog):
                                                         )
                         
                         try:
-                            input_template = json.loads(message.content)
-                            templates[new_template] = input_template
+                            if templates is None:
+                                await save_raid_templates(ctx.guild.id, json.loads(f'{{"{new_template}":{message.content}}}'))
 
-                            await save_raid_templates(templates)
-                            
+                            else:
+                                templates[new_template] = json.loads(message.content)
+                                await save_raid_templates(ctx.guild.id, templates)
+                           
                             await ctx.send("Operação concluida com sucesso.")
 
                         except Exception as e:
@@ -191,8 +193,11 @@ class Raids(commands.Cog):
 
         async with ctx.typing():
             if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id or ctx.author.id in permited:
-                templates = await get_raid_templates()
+                
+                templates = await get_raid_templates(ctx.guild.id)
+
                 if templates and template_name in templates:
+                    
                     template = templates[template_name]
                     embed = Embed(title=f'> {template_name}', description='')
                     embed.add_field(name='', value=f'```{json.dumps(template, sort_keys=True, indent=2)}```', inline=False)
@@ -223,7 +228,7 @@ class Raids(commands.Cog):
                             input_template = json.loads(message.content)
                             templates[template_name] = input_template
 
-                            await save_raid_templates(templates)
+                            await save_raid_templates(ctx.guild.id, templates)
                             
                             await ctx.send("Operação concluida com sucesso.")
 
@@ -243,12 +248,17 @@ class Raids(commands.Cog):
 
         async with ctx.typing():
             if ctx.author == ctx.guild.owner or ctx.author.id == self.god_id or ctx.author.id in permited:
-                templates = await get_raid_templates()
+                templates = await get_raid_templates(ctx.guild.id)
                 if templates and not del_template in templates:
                     await ctx.send("Template não existe")
                 else:
                     
-                    msg = await ctx.send(f'Atenção!\nTem certeza que você quer deletar o template {del_template}?')
+                    template = templates[del_template]
+                    embed = Embed(title=f'> {del_template}', description='')
+                    embed.add_field(name='', value=f'```{json.dumps(template, sort_keys=True, indent=2)}```', inline=False)
+                    embed.add_field(name='Atenção!', value=f'Tem certeza que você quer deletar o template {del_template}?')
+
+                    msg = await ctx.send(embed=embed)
 
                     await msg.add_reaction("\U0001F44D")
                     await msg.add_reaction("\U0001F44E")
@@ -264,7 +274,7 @@ class Raids(commands.Cog):
                         try:
                             del templates[del_template]
 
-                            await save_raid_templates(templates)
+                            await save_raid_templates(ctx.guild.id,templates)
                             
                             await ctx.send("Operação concluida com sucesso.")
 
