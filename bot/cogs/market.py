@@ -14,16 +14,15 @@ class Market(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def price_help(self, ctx: commands.Context) -> None:
-        a=0
-
-    @commands.command()
     async def price(self, ctx: commands.Context, *, typed:str) -> None:
+        """
+            <item name> t<x.x>
+        """
         # Loading
         async with ctx.typing():
             try:
                 # Load selected items info
-                selected_item = await find_item(typed)
+                selected_item, locale = await find_item(typed)
 
                 # Get item name and desciption
                 item_info = next(
@@ -32,9 +31,12 @@ class Market(commands.Cog):
                             if item.UniqueName == selected_item
                     )
                 )
+                
+                item_name = item_info.LocalizedNames.dict()
+                item_name_locale = item_name[str(locale)]
 
-                item_name = item_info.LocalizedNames.PTBR
-                item_desc = item_info.LocalizedDescriptions.PTBR
+                item_desc = item_info.LocalizedDescriptions.dict()
+                item_desc_locale = item_desc[str(locale)]
 
                 # Get prices
                 prices = await get_prices(selected_item)
@@ -94,8 +96,8 @@ class Market(commands.Cog):
                     try:
                         # EMBED 
                         embed = Embed(
-                            title=f'Preços atuais para {item_name}',
-                            description=f'{item_desc}'
+                            title=f'Preços atuais para {item_name_locale}',
+                            description=f'{item_desc_locale}'
                         )
                         embed.set_thumbnail(url= await get_image_url(selected_item))
                         embed.add_field(name="confira os preços abaixo", value=20*"-", inline=False)

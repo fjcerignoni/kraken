@@ -9,11 +9,35 @@ import jellyfish as jf
 from data_models import Alliance, Guild, Item, Player, Price
 
 BASE_DIR = os.path.dirname(os.path.abspath(__name__))
+DB_DIR = os.path.join(BASE_DIR, 'bot','db')
 
+# MISC
 
 def _similarity_score(a:str, b:str) -> float:
     score =  jf.jaro_distance(a.lower(), b.lower())
     return score
+
+async def save_raid_templates(server_id, new_template) -> None:   
+    raid_templates_filepath = os.path.join(DB_DIR, 'raid_templates', f'{server_id}.json')
+    try: 
+        with open(raid_templates_filepath, 'w', encoding='utf-8') as file:
+            json.dump(new_template, file, indent=4)
+
+    except Exception as e:
+        print(e)
+
+async def get_raid_templates(server_id) -> dict:
+    raid_templates_filepath = os.path.join(DB_DIR, 'raid_templates', f'{server_id}.json')
+    try: 
+        if os.path.exists(raid_templates_filepath):
+            with open(raid_templates_filepath, 'r', encoding='utf-8') as file:
+                raid_templates = json.load(file)
+                
+            return raid_templates
+        else:
+            raise Exception('json file not found.')
+    except Exception as e:
+        print(e)
 
 # ITEMS APIs
 
@@ -27,13 +51,12 @@ async def get_items() -> list:
 
             return [Item(**item_data) for item_data in data]
         else:
-            raise Exception('Arquivo db/items.json não encontrado.')
+            raise Exception('file db/item.json not found.')
 
     except Exception as e:
         print(e)
-    
 
-async def find_item(usr_input:str) -> str:
+async def find_item(usr_input:str) -> tuple:
 
     item_list = await get_items()
     tier = None
@@ -55,8 +78,14 @@ async def find_item(usr_input:str) -> str:
             pass
 
         for item in item_list:
-            if item.LocalizedNames: 
-                item.score = _similarity_score(usr_input, item.LocalizedNames.PTBR)
+            if item.LocalizedNames:
+                locale_scores = [[name[0], _similarity_score(usr_input, name[1])] for name in item.LocalizedNames ]
+                locale_scores.sort(reverse=True, key=lambda x:x[1])
+
+                locale, score = locale_scores[0]
+
+                item.score_locale = locale
+                item.score = score
         item_list.sort(reverse = True, key=lambda item: item.score)
 
         if tier and enchantment:
@@ -69,7 +98,9 @@ async def find_item(usr_input:str) -> str:
         else:
             unique_name = item_list[0].UniqueName
 
-        return next((item for item in item_list if item.UniqueName == unique_name), None).UniqueName
+        found = next((item for item in item_list if item.UniqueName == unique_name), None)
+
+        return (found.UniqueName, found.score_locale)
 
     except Exception as e:
         print(e)
@@ -109,17 +140,8 @@ async def get_alliance(alliance_id:str) -> dict:
     try:
         with urllib.request.urlopen(f'{_url("alliances")}/{alliance_id}') as src:
             data = json.loads(src.read().decode())
-
-            return Alliance( \
-                    AllianceId=data["AllianceId"], \
-                    AllianceName=data["AllianceName"], \
-                    AllianceTag=data["AllianceTag"], \
-                    FounderId=data["FounderId"], \
-                    FounderName=data["FounderName"], \
-                    Founded=data["Founded"], \
-                    Guilds=data["Guilds"],
-                    NumPlayers=data["NumPlayers"]
-            )
+            return Alliance(**data)
+    
     except Exception as e:
         print(e)
 
@@ -129,22 +151,7 @@ async def get_guild(guild_name:str) -> dict:
             guild_id = json.loads(src.read().decode())['guilds'][0]["Id"]
         with urllib.request.urlopen(f'{_url("guilds")}/{guild_id}') as src:
             data = json.loads(src.read().decode())
-            return Guild( \
-                    Id=data["Id"], \
-                    Name=data["Name"], \
-                    FounderId=data["FounderId"], \
-                    FounderName=data["FounderName"], \
-                    Founded=data["Founded"], \
-                    AllianceTag=data["AllianceTag"], \
-                    AllianceId=data["AllianceId"],  \
-                    AllianceName=data["AllianceName"], \
-                    Logo=data["Logo"], \
-                    KillFame=data["killFame"], \
-                    DeathFame=data["DeathFame"], \
-                    AttacksWon=data["AttacksWon"], \
-                    DefensesWon=data["DefensesWon"], \
-                    MemberCount=data["MemberCount"] \
-            )
+            return Guild(**data)
             
     except Exception as e:
         print(e)
@@ -163,7 +170,10 @@ async def get_player(player_name:str) -> dict:
     try:
         # Search for player by name
         with urllib.request.urlopen(_search(urllib.parse.quote(player_name))) as src:
-            player_id = json.loads(src.read().decode())['players'][0]['Id']
+            players = json.loads(src.read().decode())['players']
+            players.sort(reverse=True, key=lambda player: player['KillFame'])
+            player_id = players[0]['Id']
+            
         # Get player info by ID
         with urllib.request.urlopen(f'{_url("players")}/{player_id}') as src:
             data = json.loads(src.read().decode())

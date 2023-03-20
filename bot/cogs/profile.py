@@ -12,62 +12,12 @@ class Profile(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def profile_guild(self, ctx:commands.Context, *, typed:str) -> None:
-        async with ctx.typing():
-            try:
-                guild = await get_guild(typed)
-                if guild == None:
-                  raise Exception('Guild not found.')
-            
-                alliance = await get_alliance(guild.AllianceId)
-
-                # create list with players name consulting tools4albion API and sort
-                players = [player.Name for player in await get_guild_players(guild.Id)]
-                players.sort()
-
-                # create chunks to better display the information in discord embed
-                chunk_size= int(len(players) / 3)
-                chunk=[players[i:i + chunk_size] for i in range(0, len(players), chunk_size)]
-
-                column1 = ''.join(f'{player}\n' for player in chunk[0])
-                column2 = ''.join(f'{player}\n' for player in chunk[1])
-                column3 = ''.join(f'{player}\n' for player in chunk[2])
-
-                # crate embed
-                embed = Embed(
-                    title=f'> [{guild.AllianceTag}] {guild.Name}',
-                    color=0xFF5733
-                )
-
-                embed.add_field(name="Criada em", value=guild.Founded.strftime("%d/%m/%y"), inline=True)
-                embed.add_field(name="Kill Fame", value=format_string('%d', guild.KillFame, 1), inline=True)
-                embed.add_field(name="Death Fame", value=format_string('%d', guild.DeathFame, 1), inline=True)
-               
-                embed.add_field(name="", value="```Jogadores```", inline=False)
-                embed.add_field(name="Nº Players", value=len(players), inline=False)
-                embed.add_field(name="", value=column1, inline=True)
-                embed.add_field(name="", value=column2, inline=True)
-                embed.add_field(name="", value=column3, inline=True)
-
-                if alliance != None:
-                  embed.add_field(name="", value="```Aliança```", inline=False)
-                  embed.add_field(name="Nome", value=alliance.AllianceName, inline=True)
-                  embed.add_field(name="Tag", value=alliance.AllianceTag, inline=True)
-                  embed.add_field(name="Nº Players", value=alliance.NumPlayers, inline=True)
-
-                embed.set_footer(text="""
-Estas informações são carregadas do projeto tools4albion e podem
-ter um delay alguns dias em relação ao Albion Online.
-
-Desenvolvido por Ac1dTrip & Caionagyy""")
-                
-                await ctx.send(embed=embed)
-            except Exception as e:
-                await ctx.send('Ocorreu um erro.')
-                print(e)
-
-    @commands.command()
     async def profile(self, ctx: commands.Context, *args) -> None:
+        """
+            <player_name>
+
+            The command shows the stats of a given player (IGN).
+        """
         async with ctx.typing():
             try:
                   # join all arguments provided by the user to get the nickname
@@ -156,3 +106,62 @@ Desenvolvido por Ac1dTrip & Caionagyy""")
                   # Enviando o embed para o canal
                   await ctx.send(embed=embed)
 
+    @commands.command()
+    async def profile_guild(self, ctx:commands.Context, *, typed:str) -> None:
+        """
+            <guild_name>
+
+            The command shows the stats of a given guild (IGN).
+        """
+        async with ctx.typing():
+            try:
+                guild = await get_guild(typed)
+                if guild == None:
+                  raise Exception('Guild not found.')
+            
+                alliance = await get_alliance(guild.AllianceId)
+
+                # create list with players name consulting tools4albion API and sort
+                players = [player.Name for player in await get_guild_players(guild.Id)]
+                players.sort()
+
+                # create chunks to better display the information in discord embed
+                chunk_size= int(len(players) / 3)
+                chunk=[players[i:i + chunk_size] for i in range(0, len(players), chunk_size)]
+
+                column1 = ''.join(f'{player}\n' for player in chunk[0])
+                column2 = ''.join(f'{player}\n' for player in chunk[1])
+                column3 = ''.join(f'{player}\n' for player in chunk[2])
+
+                # crate embed
+                embed = Embed(
+                    title=f'> [{guild.AllianceTag}] {guild.Name}',
+                    color=0xFF5733
+                )
+
+                embed.add_field(name="Criada em", value=guild.Founded.strftime("%d/%m/%y"), inline=True)
+                embed.add_field(name="Kill Fame", value=format_string('%d', guild.killFame, 1), inline=True)
+                embed.add_field(name="Death Fame", value=format_string('%d', guild.DeathFame, 1), inline=True)
+               
+                embed.add_field(name="", value="```Jogadores```", inline=False)
+                embed.add_field(name="Nº Players", value=len(players), inline=False)
+                embed.add_field(name="", value=column1, inline=True)
+                embed.add_field(name="", value=column2, inline=True)
+                embed.add_field(name="", value=column3, inline=True)
+
+                if alliance != None:
+                  embed.add_field(name="", value="```Aliança```", inline=False)
+                  embed.add_field(name="Nome", value=alliance.AllianceName, inline=True)
+                  embed.add_field(name="Tag", value=alliance.AllianceTag, inline=True)
+                  embed.add_field(name="Nº Players", value=alliance.NumPlayers, inline=True)
+
+                embed.set_footer(text="""
+Estas informações são carregadas do projeto tools4albion e podem
+ter um delay alguns dias em relação ao Albion Online.
+
+Desenvolvido por Ac1dTrip & Caionagyy""")
+                
+                await ctx.send(embed=embed)
+            except Exception as e:
+                await ctx.send('Ocorreu um erro.')
+                print(e)
