@@ -1,0 +1,29 @@
+{
+    "avalon": [
+        "1x Tank",
+        "1x Offtank",
+        "1x Arcano Elevado",
+        "1x 1h Arcano",
+        "1x Main Healer",
+        "1x Party Healer",
+        "1x Bruxo",
+        "1x Fire",
+        "2x Frost",
+        "3x Raiz-Ferrea",
+        "1x Quebra-Reino",
+        "1x Caca-Espirito",
+        "1x Entalhada",
+        "4x Xbow",
+        "1x Scout",
+        "Lista de Espera"
+    ],
+    "world_boss": [
+        "1x Tank",
+        "1x Main Healer",
+        "1x Party Healer",
+        "4x DPS",
+        "1x SC",
+        "1x Enigmatico",
+        "Lista de Espera"
+    ]
+}
