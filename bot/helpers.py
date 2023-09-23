@@ -78,14 +78,16 @@ async def find_item(usr_input:str) -> tuple:
             pass
 
         for item in item_list:
-            if item.LocalizedNames:
-                locale_scores = [[name[0], _similarity_score(usr_input, name[1])] for name in item.LocalizedNames ]
-                locale_scores.sort(reverse=True, key=lambda x:x[1])
+            if item.LocalizedNames: 
+                item.score = _similarity_score(usr_input, item.LocalizedNames.PTBR)            
+            # if item.LocalizedNames:
+            #     locale_scores = [[name[0], _similarity_score(usr_input, name[1])] for name in item.LocalizedNames ]
+            #     locale_scores.sort(reverse=True, key=lambda x:x[1])
 
-                locale, score = locale_scores[0]
+            #     locale, score = locale_scores[0]
 
-                item.score_locale = locale
-                item.score = score
+            #     item.score_locale = locale
+            #     item.score = score
         item_list.sort(reverse = True, key=lambda item: item.score)
 
         if tier and enchantment:
@@ -98,9 +100,10 @@ async def find_item(usr_input:str) -> tuple:
         else:
             unique_name = item_list[0].UniqueName
 
-        found = next((item for item in item_list if item.UniqueName == unique_name), None)
+        return next((item for item in item_list if item.UniqueName == unique_name), None).UniqueName
 
-        return (found.UniqueName, found.score_locale)
+        # found = next((item for item in item_list if item.UniqueName == unique_name), None)
+        # return (found.UniqueName, found.score_locale)
 
     except Exception as e:
         print(e)
