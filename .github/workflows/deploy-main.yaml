@@ -18,17 +18,9 @@ jobs:
       - name: Create .env file
       - run: |
           sudo newgrp docker
-          cd "$GITHUB_WORSPACE"
-
           echo "TOKEN=${{ secrets.TOKEN }}" >> .env
           echo "GOD_ID=${{ secrets.GOD_ID }}" >> .env
+        working_directory: $GITHUB_WORSPACE
 
-      - name: SSH into EC2 and Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_NAME }}
-          username: ${{ secrets.USER_NAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: whoami
 
 
