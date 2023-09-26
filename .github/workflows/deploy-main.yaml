@@ -6,9 +6,9 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to EC2
-    runs-on: ubuntu-latest
-    env: 
+    - name: Deploy to EC2
+      runs-on: ubuntu-latest
+      env: 
       GITHUB_WORSPACE: /home/ec2-user/
 
     
