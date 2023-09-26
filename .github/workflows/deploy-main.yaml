@@ -1,30 +1,37 @@
-name: Deploy
+name: Deploy Kraken to EC2
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  Deploy:
+  deploy:
     name: Deploy to EC2
     runs-on: ubuntu-latest
-
+    env: 
+      GITHUB_WORSPACE: /home/ec2-user/
+    
     steps:
-      - uses: actions/checkout@v2 
-      - name: Build & Deploy
-        env:
-            PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-            HOSTNAME: ${{secrets.SSH_HOST}}
-            USER_NAME: ${{secrets.USER_NAME}}
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-        run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+      - name: Create .env file
+      - run: |
+          sudo newgrp docker
+          cd "$GITHUB_WORSPACE"
 
-              # Now we have got the access of EC2 and we will start the deploy .
-              cd /home/ssm-user/kraken &&
-              git fetch --all &&
-              git reset --hard origin/dev &&
-              git pull origin main &&
-              sudo bash build.sh
-              '
+          echo "TOKEN=${{ secrets.TOKEN }}" >> .env
+          echo "GOD_ID=${{ secrets.GOD_ID }}" >> .env
+
+      - name: SSH into EC2 and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_NAME }}
+          username: ${{ secrets.USER_NAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+          sudo newgrp docker
+          cd "$GITHUB_WORSPACE"
+
+          bash ./build.sh
+
