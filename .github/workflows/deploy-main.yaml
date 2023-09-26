@@ -30,6 +30,7 @@ jobs:
           username: ${{ secrets.USER_NAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            sudo newgrp docker
             cd "$GITHUB_WORSPACE"
             bash ./build.sh
 
