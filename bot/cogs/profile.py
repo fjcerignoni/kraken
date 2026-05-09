@@ -1,11 +1,13 @@
-# from pathlib import Path
+import logging
 from locale import setlocale, format_string, LC_ALL
 from discord.ext import commands
 from discord import Embed
 from helpers import get_player, get_guild, get_guild_players, get_alliance
 
-# current_path = current_path = Path(__file__).parent.absolute()
+logger = logging.getLogger("kraken.profile")
+
 setlocale(LC_ALL, 'pt_BR.UTF-8')
+
 
 class Profile(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
@@ -91,8 +93,8 @@ class Profile(commands.Cog):
                                           f"Black: {gather_stats['All']['Outlands']:,}\n"
                                           f"Avalon: {gather_stats['All']['Avalon']:,}",
                                     inline=True)
-            except Exception as e:
-                  print(e)
+            except Exception:
+                  logger.exception("profile command error")
                   embed = Embed(
                         title=f'Jogador não encontrado',
                         description=f'Não encontramos informações para o jogador requisitado.'
@@ -162,6 +164,6 @@ ter um delay alguns dias em relação ao Albion Online.
 Desenvolvido por Ac1dTrip & Caionagyy""")
                 
                 await ctx.send(embed=embed)
-            except Exception as e:
+            except Exception:
                 await ctx.send('Ocorreu um erro.')
-                print(e)
+                logger.exception("profile_guild command error")

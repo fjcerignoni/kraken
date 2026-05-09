@@ -6,7 +6,10 @@ import urllib.request
 
 import jellyfish as jf
 
+import settings
 from data_models import Alliance, Guild, Item, Player, Price
+
+logger = logging.getLogger("kraken.helpers")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__name__))
 DB_DIR = os.path.join(BASE_DIR, 'bot','db')
@@ -23,8 +26,8 @@ async def save_raid_templates(server_id, new_template) -> None:
         with open(raid_templates_filepath, 'w', encoding='utf-8') as file:
             json.dump(new_template, file, indent=4)
 
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("save_raid_templates failed for server %s", server_id)
 
 async def get_raid_templates(server_id) -> dict:
     raid_templates_filepath = os.path.join(DB_DIR, 'raid_templates', f'{server_id}.json')
@@ -36,8 +39,8 @@ async def get_raid_templates(server_id) -> dict:
             return raid_templates
         else:
             raise Exception('json file not found.')
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("get_raid_templates failed for server %s", server_id)
 
 # ITEMS APIs
 
@@ -53,8 +56,8 @@ async def get_items() -> list:
         else:
             raise Exception('file db/item.json not found.')
 
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("get_items failed")
 
 async def find_item(usr_input:str) -> tuple:
 
@@ -80,14 +83,6 @@ async def find_item(usr_input:str) -> tuple:
         for item in item_list:
             if item.LocalizedNames: 
                 item.score = _similarity_score(usr_input, item.LocalizedNames.PTBR)            
-            # if item.LocalizedNames:
-            #     locale_scores = [[name[0], _similarity_score(usr_input, name[1])] for name in item.LocalizedNames ]
-            #     locale_scores.sort(reverse=True, key=lambda x:x[1])
-
-            #     locale, score = locale_scores[0]
-
-            #     item.score_locale = locale
-            #     item.score = score
         item_list.sort(reverse = True, key=lambda item: item.score)
 
         if tier and enchantment:
@@ -102,11 +97,8 @@ async def find_item(usr_input:str) -> tuple:
 
         return next((item for item in item_list if item.UniqueName == unique_name), None).UniqueName
 
-        # found = next((item for item in item_list if item.UniqueName == unique_name), None)
-        # return (found.UniqueName, found.score_locale)
-
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("find_item failed for input '%s'", usr_input)
 
 ## MARKET API
 
@@ -119,15 +111,12 @@ async def get_prices(unique_name:str) -> list:
         with urllib.request.urlopen(url) as src:
             data = json.loads(src.read().decode())
             return [Price(**obj) for obj in data]
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("get_prices failed for %s", unique_name)
 
 
 async def get_image_url(unique_name:str, quality:int = 3) -> str:
-    try:
-        return f'https://render.albiononline.com/v1/item/{unique_name}.png?&quality={quality}'
-    except Exception as e:
-        print(e)
+    return f'https://render.albiononline.com/v1/item/{unique_name}.png?&quality={quality}'
 
 
 ## GUILD AND PLAYERS API
@@ -145,8 +134,8 @@ async def get_alliance(alliance_id:str) -> dict:
             data = json.loads(src.read().decode())
             return Alliance(**data)
     
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("get_alliance failed for %s", alliance_id)
 
 async def get_guild(guild_name:str) -> dict:
     try:
@@ -156,8 +145,8 @@ async def get_guild(guild_name:str) -> dict:
             data = json.loads(src.read().decode())
             return Guild(**data)
             
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("get_guild failed for '%s'", guild_name)
 
 
 async def get_guild_players(guild_id:str) -> list:
@@ -166,8 +155,8 @@ async def get_guild_players(guild_id:str) -> list:
             data = json.loads(src.read().decode())
             return [Player(Id=obj["Id"], Name=obj["Name"]) for obj in data]
             
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("get_guild_players failed for %s", guild_id)
 
 async def get_player(player_name:str) -> dict:
     try:
@@ -183,5 +172,5 @@ async def get_player(player_name:str) -> dict:
 
             return data
 
-    except Exception as e:
-        print(e)
+    except Exception:
+        logger.exception("get_player failed for '%s'", player_name)

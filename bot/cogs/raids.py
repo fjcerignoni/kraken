@@ -1,9 +1,13 @@
+import json
+import logging
+
 from discord import Embed
 from discord.ext import commands
 from data_models import Servers, Permited
 from helpers import get_raid_templates, save_raid_templates
 
-import json
+logger = logging.getLogger("kraken.raids")
+
 
 class Raids(commands.Cog):
     def __init__(self, bot:commands.Bot, god_id:int, Session: dict) -> None:
@@ -93,8 +97,8 @@ class Raids(commands.Cog):
                 await msg.edit(embed=update)
                 # break
 
-            except Exception as e:
-                print(e)
+            except Exception:
+                logger.exception("on_raw_reaction_add failed")
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload:object) -> None:
@@ -117,8 +121,8 @@ class Raids(commands.Cog):
                 await msg.edit(embed=update)
                 
                 # break
-            except Exception as e:
-                print(e)
+            except Exception:
+                logger.exception("on_raw_reaction_remove failed")
 
     @commands.command()
     async def raid_templates(self, ctx:commands.Context) -> None:
@@ -178,8 +182,8 @@ class Raids(commands.Cog):
                            
                             await ctx.send("Operação concluida com sucesso.")
 
-                        except Exception as e:
-                            print(e)
+                        except Exception:
+                            logger.exception("create_raid_template failed")
                             await ctx.send("O template deve ser uma lista (array)")
                     else:
                         await ctx.send("Operação Cancelada")     
@@ -232,8 +236,8 @@ class Raids(commands.Cog):
                             
                             await ctx.send("Operação concluida com sucesso.")
 
-                        except Exception as e:
-                            print(e)
+                        except Exception:
+                            logger.exception("update_raid_template failed")
                             await ctx.send("O template deve ser uma lista (array)")
                     else:
                         await ctx.send("Operação Cancelada")     
@@ -278,8 +282,8 @@ class Raids(commands.Cog):
                             
                             await ctx.send("Operação concluida com sucesso.")
 
-                        except Exception as e:
-                            print(e)
+                        except Exception:
+                            logger.exception("delete_raid_template failed")
                     else:
                         await ctx.send("Operação Cancelada")     
             else:

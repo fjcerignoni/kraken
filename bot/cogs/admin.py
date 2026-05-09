@@ -1,9 +1,12 @@
+import logging
+
 from discord import Embed, Member
 from discord.ext import commands
 from data_models import Servers, Permited, Roles, AlbionGuilds
 from helpers import get_guild, get_guild_players
 
-## TODO Adicionar logging
+logger = logging.getLogger("kraken.admin")
+
 
 class Admin(commands.Cog):
     def __init__(self, bot:commands.Bot, god_id:str, Session) -> None:
@@ -100,9 +103,9 @@ class Admin(commands.Cog):
                         else:
                             await ctx.send(f"Operação cancelada.")
 
-                except Exception as e:
+                except Exception:
                     await ctx.send("Ocorreu um erro.")
-                    print(e)
+                    logger.exception("init failed")
             else:
                 await ctx.send("Você não tem permissões para executar esse comando")
 
@@ -144,9 +147,9 @@ class Admin(commands.Cog):
                             else:
                                 await ctx.send(f'{member} ja cadastrado.')
 
-                except Exception as e:
+                except Exception:
                     await ctx.send('Ocorreu um erro.')
-                    print(e)
+                    logger.exception("give_permition failed")
         else:
             await ctx.send("Você não tem permissões para executar esse comando")
 
@@ -178,8 +181,8 @@ class Admin(commands.Cog):
                         else:
                             await ctx.send(f'{member} não tem permissões.')
 
-                except Exception as e:
+                except Exception:
                     await ctx.send('Ocorreu um erro.')
-                    print(e)
+                    logger.exception("revoke_permition failed")
         else:
             await ctx.send("Você não tem permissões para executar esse comando")

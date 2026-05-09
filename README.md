@@ -66,46 +66,31 @@ Show help to organize a raid in Discord.
 
 - Requirements:
   - Python 3.8 or higher
+  - [uv](https://docs.astral.sh/uv/getting-started/installation/)
   - Create Discord Bot at [Discord Developers Applications](https://discord.com/developers/applications) to get a valid token and use [Discord Permissions](https://discordapi.com/permissions.html) to add the bot in your server
   - Clone this repository
   - Add token to a .env file in the project root, use .env-sample as exemple.
 
 
-1) Create python environment
+1. Sync the project environment
    ```
-    $ python -m venv --clear --copies .venv
+    $ uv sync
    ```
-2) Enter environment 
+2. Run the bot
    ```
-   Windows
-    $ .venv\Scripts\activate.bat
-
-   Linux
-    $ source .venv/bin/activate
-   ```
-3) Upgrade pip and wheel
-   ```
-    (.venv) $ python -m pip install --upgrade pip wheel
+    $ uv run python bot/main.py
    ```
 
-4) Install dependencies
+The first execution creates `.venv` automatically and reuses it on subsequent runs.
 
-   ```
-    (.venv) $ python -m pip install -r requirements.txt
-   ```
+If you prefer entering the virtual environment directly, use:
 
-5) Create database
-   ```
-    (.venv) $python bot\db\init_db.py
-   ```
-
-6) Start bot
-   ```
-    (.venv) $python bot\main.py
-   ```
+```
+$ source .venv/bin/activate
+```
 
 # Scheduler
-Inside the ``scheduler`` folder there are 2 scripts: ``scheduler.py`` and ``jobs.py``
+Inside the ``bot/scheduler`` folder there are 2 scripts: ``scheduler.py`` and ``jobs.py``
 - ``jobs.py``: ETL processes that can be executed manually or scheduled by applications/libraries like *python-crontab*;
 - ``scheduler.py``: *python-crontab* implementation to run jobs defined on ``jobs.py``;
 

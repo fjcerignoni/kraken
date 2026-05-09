@@ -1,0 +1,18 @@
+[project]
+name = "kraken"
+version = "0.1.0"
+description = "Discord bot to fetch Albion Online information for the Shadow Spirits Guild"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "croniter",
+    "discord==2.0.0",
+    "jellyfish==0.9.0",
+    "pydantic==1.10.2",
+    "python-crontab",
+    "python-dotenv==0.21.0",
+    "SQLAlchemy==1.4.41",
+]
+
+[tool.uv]
+package = false

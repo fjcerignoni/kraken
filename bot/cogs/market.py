@@ -1,3 +1,4 @@
+import logging
 from locale import setlocale, format_string, LC_ALL
 from discord import Embed
 from discord.ext import commands
@@ -5,7 +6,8 @@ from datetime import datetime, timedelta
 
 from helpers import find_item, get_prices, get_image_url, get_items
 from data_models import Item
-## TODO Adicionar logging
+
+logger = logging.getLogger("kraken.market")
 
 setlocale(LC_ALL, 'pt_BR.UTF-8')
 
@@ -92,8 +94,8 @@ class Market(commands.Cog):
 
                         time_string_all.append(time_string)
 
-                except Exception as e:
-                    print(e)
+                except Exception:
+                    logger.exception("price data processing error")
 
                 finally:
                 
@@ -121,12 +123,12 @@ class Market(commands.Cog):
                         else:
                             raise Exception
                     
-                    except Exception as e:
-                        print(e)
+                    except Exception:
+                        logger.exception("price embed build error")
                         embed.add_field(name="Sem Dados", value="Sem dados para o item requisitado.", inline=True)
 
-            except Exception as e:
-                print(e)
+            except Exception:
+                logger.exception("price command error")
                 embed = Embed(
                     title=f'Item não encontrado',
                     description=f'Não encontramos informação para o item requisitado.'
