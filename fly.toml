@@ -1,25 +1,36 @@
-app = "kraken-shadow-spirits"
-primary_region = "gru"
+# fly.toml app configuration file generated for kraken-shadow-spirits on 2026-05-09T16:41:59Z
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'kraken-shadow-spirits'
+primary_region = 'ams'
 
 [build]
-  dockerfile = "Dockerfile"
+  dockerfile = 'Dockerfile'
 
 [env]
-  HEALTH_PORT = "8080"
-  LOG_FORMAT = "json"
-  LOG_LEVEL = "INFO"
+  HEALTH_PORT = '8080'
+  LOG_FORMAT = 'json'
+  LOG_LEVEL = 'INFO'
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = false
+  auto_stop_machines = 'off'
   auto_start_machines = true
   min_machines_running = 1
-  processes = ["app"]
+  processes = ['app']
 
-[[http_service.checks]]
-  interval = "15s"
-  timeout = "5s"
-  grace_period = "45s"
-  method = "get"
-  path = "/health"
+  [[http_service.checks]]
+    interval = '15s'
+    timeout = '5s'
+    grace_period = '45s'
+    method = 'get'
+    path = '/health'
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256
